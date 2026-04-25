@@ -1,0 +1,33 @@
+1. Mục tiêu và Đối tượng
+Mục tiêu: Tạo một Web App chơi Quiz đơn giản, trực quan để cả gia đình (bố mẹ và 2 con 12-14 tuổi) cùng chơi trên điện thoại hoặc máy tính bảng.
+Phong cách: Vui tươi, hiện đại, mang tính thi đấu nhẹ nhàng.
+
+2. Tính năng chính (Core Features)
+Lựa chọn chủ đề (Category Selection): Cho phép chọn các bộ câu hỏi từ nhiều lĩnh vực:
+Công nghệ: Lịch sử máy tính, các phát minh, AI, game.
+Bóng đá: World Cup, các giải đấu lớn, cầu thủ huyền thoại.
+Văn hóa & Nghệ thuật: Anime, âm nhạc thế giới, sách văn học.
+Khoa học & Đời sống: Kiến thức tự nhiên, câu đố logic.
+Du lịch & Địa lý: Các địa danh nổi tiếng, quốc kỳ, ẩm thực.
+
+Cơ chế trò chơi:
+Mỗi lượt chơi gồm 10 câu hỏi ngẫu nhiên.
+Mỗi câu hỏi có 4 lựa chọn (Multiple choice).
+Đếm ngược thời gian: 15-20 giây mỗi câu để tăng tính kịch tính.
+Tính điểm: Điểm số dựa trên việc trả lời đúng và tốc độ trả lời (càng nhanh điểm càng cao).
+
+Bảng xếp hạng (Leaderboard): Sau khi kết thúc, hiển thị tổng điểm và thứ hạng của người chơi trong phiên đó.
+
+3. Giao diện và Trải nghiệm (UI/UX)
+Thiết kế Mobile-First: Ưu tiên hiển thị tốt trên điện thoại để mọi người cầm máy chơi dễ dàng.
+Hiệu ứng âm thanh: Tiếng "ting" khi đúng, tiếng "buzz" khi sai và nhạc nền hồi hộp khi hết giờ.
+Hiệu ứng hình ảnh: Sử dụng các màu sắc bắt mắt (Vibrant colors), có thanh tiến trình (progress bar) thể hiện thời gian.
+
+4. Yêu cầu kỹ thuật (Technical - Dành cho AI)
+Ngôn ngữ/Framework: React hoặc Next.js kết hợp với Tailwind CSS (phù hợp nhất để Vibe coding vì AI viết Tailwind cực nhanh).
+Quản lý dữ liệu: Lưu trữ câu hỏi dưới dạng tệp JSON đơn giản để dễ dàng cập nhật hoặc bổ sung.
+Trạng thái (State Management): Theo dõi số câu đúng, tổng điểm và câu hỏi hiện tại.
+
+5. Gợi ý mở rộng (Optional - Vibe Up)
+Chế độ đối kháng: Cho phép 2 người chơi cùng lúc trên một màn hình chia đôi (split-screen).
+AI Generator: Tích hợp một ô nhập liệu để AI tự tạo ra bộ 10 câu hỏi mới dựa trên một chủ đề bất kỳ mà gia đình vừa nghĩ ra.

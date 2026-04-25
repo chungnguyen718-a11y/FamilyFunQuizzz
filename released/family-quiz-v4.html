@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800;900&display=swap" rel="stylesheet">
+<title>🎮 Funny Family Quizzz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--card:#161b22;--card2:#21262d;--card3:#30363d;--text:#f0f6fc;--muted:#8b949e;--c1:#ff7b2c;--c2:#2ec4b6;--c3:#818cf8;--ok:#22c55e;--no:#ef4444;--warn:#f59e0b}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;padding:1rem 1rem 3rem}
+.screen.on{display:flex}
+.inner{width:100%;max-width:420px;display:flex;flex-direction:column;gap:.75rem}
+.logo{font-family:'Baloo 2',cursive;font-size:2.5rem;font-weight:900;text-align:center;margin:1.5rem 0 .2rem;line-height:1;background:linear-gradient(135deg,#ff7b2c,#f7c59f,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tagline{color:var(--muted);font-size:.88rem;text-align:center;margin-bottom:1rem}
+.mode-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;width:100%;max-width:420px}
+.mode-btn{background:var(--card);border-radius:14px;padding:.85rem .5rem;cursor:pointer;border:2.5px solid transparent;text-align:center;transition:all .18s}
+.mode-btn:active{transform:scale(.97)}
+.mode-btn.on{border-color:var(--c2)}
+.mode-btn .mico{font-size:1.6rem;display:block;margin-bottom:.3rem}
+.mode-btn .mname{font-size:.75rem;font-weight:800;color:var(--text)}
+.mode-btn .mdesc{font-size:.65rem;color:var(--muted);margin-top:.15rem;line-height:1.3}
+.mode-btn.on .mname{color:var(--c2)}
+.scard{background:var(--card);border-radius:16px;padding:1.1rem 1.1rem .9rem}
+.slabel{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.7rem}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.cat-btn{background:var(--card2);border-radius:12px;padding:.65rem .55rem;cursor:pointer;border:2.5px solid transparent;transition:all .18s;text-align:center;position:relative}
+.cat-btn.on{border-color:var(--c2);background:rgba(46,196,182,.1)}
+.cat-btn:active{transform:scale(.96)}
+.cat-emoji{font-size:1.4rem;display:block;margin-bottom:.15rem}
+.cat-name{font-size:.76rem;font-weight:700;line-height:1.2}
+.cat-check{position:absolute;top:5px;right:7px;font-size:.72rem;color:var(--c2);opacity:0;transition:opacity .15s}
+.cat-btn.on .cat-check{opacity:1}
+.ai-input-area{width:100%;background:var(--card2);border:2px solid transparent;border-radius:12px;padding:.8rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;outline:none;resize:none;min-height:75px;transition:border .2s}
+.ai-input-area:focus{border-color:var(--c3)}
+.ai-input-area::placeholder{color:var(--muted);font-weight:400}
+.ai-status{text-align:center;font-size:.82rem;min-height:1.4rem;color:var(--muted);margin-top:.4rem}
+.dots{display:inline-flex;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--c3);animation:bounce .7s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.pcount-row{display:flex;gap:.5rem}
+.pcount-btn{flex:1;padding:.55rem;background:var(--card2);border-radius:10px;border:2.5px solid transparent;cursor:pointer;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--muted);text-align:center;transition:all .18s}
+.pcount-btn.on{border-color:var(--c1);color:var(--c1);background:rgba(255,123,44,.08)}
+.prow{display:flex;align-items:center;gap:.65rem}
+.pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.pinput{flex:1;background:var(--card2);border:2px solid transparent;border-radius:10px;padding:.45rem .75rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:700;outline:none;transition:border .18s}
+.pinput:focus{border-color:var(--c2)}
+.pinput::placeholder{color:var(--muted);font-weight:400}
+/* AVATAR PICKER */
+.av-pick-wrap{display:none;background:var(--card2);border-radius:12px;padding:.65rem;margin-top:.35rem;animation:fadeUp .2s ease}
+.av-pick-wrap.open{display:block}
+.av-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem}
+.av-opt{font-size:1.5rem;width:100%;aspect-ratio:1;border-radius:10px;background:var(--card3);border:2.5px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.av-opt:active{transform:scale(.93)}
+.av-opt.picked{border-color:var(--c2);background:rgba(46,196,182,.15)}
+.av-trigger{font-size:.95rem;cursor:pointer;transition:transform .15s;user-select:none;display:inline-block}
+.av-trigger:active{transform:scale(.9)}
+.btn{width:100%;padding:.95rem;border-radius:14px;border:none;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all .18s;letter-spacing:.01em}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-orange{background:linear-gradient(135deg,#ff7b2c,#e5631a);color:#fff;box-shadow:0 4px 18px rgba(255,123,44,.4)}
+.btn-ghost{background:var(--card);color:var(--muted);border:2px solid var(--card3)}
+/* TURN */
+#turnScreen{justify-content:center}
+.turn-box{text-align:center;padding:2rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:.9rem;width:100%;max-width:380px}
+.turn-av{font-size:4rem;line-height:1;animation:pop .4s ease}
+.turn-name{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:900}
+.turn-sub{color:var(--muted);font-size:.9rem;line-height:1.5}
+.turn-cats{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center}
+.chip{background:var(--card2);border-radius:20px;padding:.25rem .7rem;font-size:.76rem;font-weight:700;color:var(--muted)}
+.secret-note{background:rgba(129,140,248,.1);border:1.5px solid rgba(129,140,248,.3);border-radius:12px;padding:.6rem 1rem;font-size:.8rem;color:#a5b4fc;display:flex;align-items:center;gap:.5rem;width:100%;justify-content:center}
+/* GAME */
+#gameScreen{padding:.75rem 1rem}
+.game-top{width:100%;max-width:420px}
+.gtop-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.qbadge{background:var(--card2);border-radius:8px;padding:.28rem .65rem;font-size:.78rem;font-weight:800;color:var(--muted)}
+.player-pill{display:flex;align-items:center;gap:.4rem;border-radius:20px;padding:.28rem .75rem}
+.timer-wrap{position:relative;height:7px;background:var(--card2);border-radius:99px;overflow:hidden;margin-bottom:.7rem}
+.timer-bar{height:100%;border-radius:99px;transition:width 1s linear,background .4s;background:var(--c2)}
+.qcard{background:var(--card);border-radius:16px;padding:1.1rem;width:100%;max-width:420px;min-height:95px;display:flex;align-items:center;margin-bottom:.7rem}
+.qtext{font-size:.98rem;font-weight:700;line-height:1.55}
+.opts{display:flex;flex-direction:column;gap:.5rem;width:100%;max-width:420px}
+.opt{display:flex;align-items:center;gap:.65rem;background:var(--card);border:2.5px solid transparent;border-radius:13px;padding:.75rem .85rem;cursor:pointer;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;transition:all .14s;text-align:left}
+.opt:active{transform:scale(.99)}
+.opt:disabled{cursor:default}
+.opt.correct{background:rgba(34,197,94,.13);border-color:var(--ok)}
+.opt.wrong{background:rgba(239,68,68,.1);border-color:var(--no)}
+.olabel{width:24px;height:24px;border-radius:7px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:900;flex-shrink:0;transition:all .15s}
+.opt.correct .olabel{background:var(--ok);color:#fff}
+.opt.wrong .olabel{background:var(--no);color:#fff}
+.score-strip{display:flex;gap:.45rem;width:100%;max-width:420px;margin-top:.7rem;flex-wrap:wrap;justify-content:center}
+.sc-pill{display:flex;align-items:center;gap:.3rem;border-radius:10px;padding:.28rem .65rem;font-size:.76rem;font-weight:700;background:var(--card)}
+.sc-pill.active-p{outline:2px solid var(--c1)}
+.sc-hidden{font-size:.7rem;color:var(--muted)}
+.pdots{display:flex;gap:3px;margin-top:.6rem;flex-wrap:wrap;justify-content:center;width:100%;max-width:420px}
+.pdot{width:20px;height:5px;border-radius:3px;background:var(--card2);transition:background .3s}
+.pdot.ok{background:var(--ok)}.pdot.no{background:var(--no)}.pdot.cur{background:var(--c1)}
+/* RACE MODE */
+#raceScreen{padding:.7rem .9rem 1.5rem;align-items:center}
+.race-header{width:100%;max-width:480px;display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.race-qbadge{background:var(--card);border-radius:8px;padding:.3rem .75rem;font-size:.82rem;font-weight:800;color:var(--muted)}
+.race-turn-pill{display:flex;align-items:center;gap:.4rem;background:var(--card);border-radius:20px;padding:.3rem .8rem;font-size:.82rem;font-weight:800;border:2px solid transparent;transition:border .2s}
+.race-timer-num{font-size:.85rem;font-weight:900;min-width:1.8rem;text-align:right}
+
+/* Race track */
+.race-track-wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:.45rem;background:var(--card);border-radius:16px;padding:.8rem .9rem;margin-bottom:.7rem}
+.race-lane{display:flex;align-items:center;gap:.5rem}
+.race-lane-bar-bg{flex:1;height:22px;background:var(--card2);border-radius:99px;overflow:visible;position:relative}
+.race-lane-bar{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.34,1.56,.64,1);position:relative;min-width:0}
+.race-avatar-flag{position:absolute;right:-14px;top:50%;transform:translateY(-50%);font-size:1.1rem;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));transition:right .5s cubic-bezier(.34,1.56,.64,1)}
+.race-lane-name{font-size:.7rem;font-weight:800;white-space:nowrap;width:38px;text-align:right;flex-shrink:0}
+.race-lane-score{font-size:.7rem;font-weight:900;width:36px;text-align:right;flex-shrink:0}
+
+.race-timer-wrap{width:100%;max-width:480px;height:7px;background:var(--card2);border-radius:99px;overflow:hidden;margin-bottom:.7rem}
+.race-timer-bar{height:100%;border-radius:99px;transition:width 1s linear,background .4s;background:var(--c2)}
+
+.race-qcard{background:var(--card);border-radius:16px;padding:1.1rem;width:100%;max-width:480px;min-height:85px;display:flex;align-items:center;margin-bottom:.65rem}
+.race-qtext{font-size:.98rem;font-weight:700;line-height:1.55}
+.race-opts{display:flex;flex-direction:column;gap:.48rem;width:100%;max-width:480px}
+.ropt{display:flex;align-items:center;gap:.65rem;background:var(--card);border:2.5px solid transparent;border-radius:13px;padding:.72rem .85rem;cursor:pointer;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;transition:all .14s;text-align:left;width:100%}
+.ropt:active{transform:scale(.99)}
+.ropt:disabled{cursor:default}
+.ropt.correct{background:rgba(34,197,94,.13);border-color:var(--ok)}
+.ropt.wrong{background:rgba(239,68,68,.1);border-color:var(--no)}
+.rolabel{width:24px;height:24px;border-radius:7px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:900;flex-shrink:0;transition:all .15s}
+.ropt.correct .rolabel{background:var(--ok);color:#fff}
+.ropt.wrong .rolabel{background:var(--no);color:#fff}
+
+/* Score pop */
+@keyframes scorePop{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-32px) scale(1.3)}}
+.score-pop{position:fixed;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:900;color:var(--ok);pointer-events:none;z-index:300;animation:scorePop .9s ease forwards}
+/* RESULT */
+#resultScreen{padding:1rem}
+.winner-banner{text-align:center;margin:.75rem 0 .25rem}
+.winner-crown{font-size:2.2rem;display:block}
+.winner-title{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff7b2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.winner-name{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900}
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:.5rem;margin:.9rem 0;width:100%;max-width:380px}
+.podium-col{display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.pod-av{font-size:1.9rem}.pod-name{font-size:.72rem;font-weight:800;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod-sc{font-size:.72rem;font-weight:800}
+.pod-block{border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;width:78px}
+.pod-block.p1{height:85px;background:linear-gradient(180deg,#ffd700,#c8a800)}
+.pod-block.p2{height:62px;background:linear-gradient(180deg,#c0c0c0,#909090)}
+.pod-block.p3{height:46px;background:linear-gradient(180deg,#cd7f32,#a05a1a)}
+.lb-list{width:100%;max-width:400px;display:flex;flex-direction:column;gap:.45rem}
+.lb-row{display:flex;align-items:center;gap:.75rem;background:var(--card);border-radius:13px;padding:.75rem .85rem;border:2px solid transparent}
+.lb-row.r1{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.06)}
+.lb-row.r2{border-color:rgba(192,192,192,.3)}
+.lb-row.r3{border-color:rgba(205,127,50,.3)}
+.lb-medal{font-size:1.1rem;width:26px;text-align:center}
+.lb-av{font-size:1.2rem;width:32px;text-align:center}
+.lb-info{flex:1}.lb-nm{font-size:.92rem;font-weight:800}.lb-dt{font-size:.71rem;color:var(--muted);margin-top:.1rem}
+.lb-sc{font-size:1.1rem;font-weight:900;color:var(--c2)}
+.result-note{font-size:.75rem;color:var(--muted);text-align:center;margin:.25rem 0}
+/* REVEAL SCREEN */
+#revealScreen{justify-content:center}
+.reveal-box{text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:2rem 1.5rem;width:100%;max-width:380px}
+.reveal-title{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:900;line-height:1.1}
+.reveal-players{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin:.25rem 0}
+.reveal-p{display:flex;flex-direction:column;align-items:center;gap:.3rem;background:var(--card);border-radius:14px;padding:.75rem .9rem;min-width:72px}
+.reveal-pav{font-size:2rem}
+.reveal-pnm{font-size:.76rem;font-weight:800}
+.reveal-pscore{font-size:.72rem;color:var(--muted)}
+.btn-green{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 18px rgba(34,197,94,.4)}
+/* ANSWER DETAIL REVIEW */
+.review-section{width:100%;max-width:400px;margin-top:.5rem}
+.review-player-hd{display:flex;align-items:center;gap:.5rem;margin:1rem 0 .4rem;font-weight:800;font-size:.9rem}
+.review-q-row{background:var(--card);border-radius:10px;padding:.6rem .75rem;margin-bottom:.3rem;border-left:3px solid transparent;font-size:.78rem}
+.review-q-row.ok{border-color:var(--ok)}.review-q-row.no{border-color:var(--no)}.review-q-row.skip{border-color:var(--card3)}
+.review-q-top{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.review-q-txt{font-weight:700;flex:1;line-height:1.35}
+.review-q-badge{font-size:.7rem;font-weight:800;padding:.15rem .45rem;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.review-q-badge.ok{background:rgba(34,197,94,.18);color:var(--ok)}
+.review-q-badge.no{background:rgba(239,68,68,.15);color:var(--no)}
+.review-q-badge.skip{background:var(--card2);color:var(--muted)}
+.review-q-ans{margin-top:.25rem;font-size:.72rem;color:var(--muted);line-height:1.4}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:99;opacity:0;transition:opacity .12s}
+.fok{background:rgba(34,197,94,.13)}.fno{background:rgba(239,68,68,.12)}
+.flash-left{position:fixed;left:0;top:0;width:50%;height:100%;pointer-events:none;z-index:98;opacity:0;transition:opacity .12s}
+.flash-right{position:fixed;right:0;top:0;width:50%;height:100%;pointer-events:none;z-index:98;opacity:0;transition:opacity .12s}
+.cconf{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.cdot{position:absolute;border-radius:2px;animation:cfall linear forwards}
+@keyframes cfall{from{transform:translateY(-20px) rotate(0);opacity:1}to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="flash" id="fl"></div>
+<div class="flash-left" id="flL"></div>
+<div class="flash-right" id="flR"></div>
+<div class="cconf" id="cc"></div>
+
+<!-- HOME -->
+<div class="screen on" id="homeScreen">
+  <div class="logo">🎮 Quiz Gia Đình</div>
+  <div class="tagline">Ai thông minh nhất nhà? Cùng thi thử! 🏆</div>
+  <div class="inner">
+    <div class="scard">
+      <div class="slabel">🎯 Chế độ chơi</div>
+      <div class="mode-row" style="grid-template-columns:1fr 1fr">
+        <div class="mode-btn on" id="modeNormal" onclick="setMode('normal',this)">
+          <span class="mico">🎮</span><div class="mname">Thường</div><div class="mdesc">Lần lượt từng người</div>
+        </div>
+        <div class="mode-btn" id="modeSplit" onclick="setMode('split',this)">
+          <span class="mico">⚔️</span><div class="mname">Đối kháng</div><div class="mdesc">2 người cùng lúc</div>
+        </div>
+        <div class="mode-btn" id="modeAI" onclick="setMode('ai',this)" style="display:none">
+          <span class="mico">🤖</span><div class="mname">AI Tạo câu</div><div class="mdesc">Chủ đề bất kỳ</div>
+        </div>
+      </div>
+    </div>
+    <div class="scard" id="catCard">
+      <div class="slabel">📚 Chủ đề (chọn nhiều)</div>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+    <div class="scard" id="aiCard" style="display:none">
+      <div class="slabel">🤖 Nhập chủ đề cho AI</div>
+      <textarea class="ai-input-area" id="aiTopic" placeholder="Ví dụ: Lịch sử Việt Nam, Các hành tinh trong vũ trụ, Ẩm thực thế giới..."></textarea>
+      <div class="ai-status" id="aiStatus"></div>
+    </div>
+    <div class="scard" id="pcountCard">
+      <div class="slabel">👥 Số người chơi</div>
+      <div class="pcount-row">
+        <div class="pcount-btn on" onclick="setPC(this,2)">2</div>
+        <div class="pcount-btn" onclick="setPC(this,3)">3</div>
+        <div class="pcount-btn" onclick="setPC(this,4)">4</div>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="slabel">✏️ Tên &amp; Avatar người chơi</div>
+      <div id="playerNameInputs" style="display:flex;flex-direction:column;gap:.6rem"></div>
+    </div>
+    <button class="btn btn-orange" id="startBtn" onclick="handleStart()">🚀 Bắt đầu!</button>
+  </div>
+</div>
+
+<!-- TURN INTRO -->
+<div class="screen" id="turnScreen">
+  <div class="turn-box inner">
+    <div class="turn-av" id="taAv">🧔</div>
+    <div class="turn-name" id="taName">Bố</div>
+    <div class="turn-sub">Đến lượt bạn! Người khác có thể xem câu hỏi nhưng <b>điểm bí mật đến cuối</b> 🤫</div>
+    <div class="turn-cats" id="taCats"></div>
+    <div class="secret-note">🔒 Điểm số ẩn — reveal khi tất cả chơi xong</div>
+    <button class="btn btn-orange" onclick="startPlayerTurn()">🎯 Tôi sẵn sàng!</button>
+  </div>
+</div>
+
+<!-- NORMAL GAME -->
+<div class="screen" id="gameScreen">
+  <div class="game-top">
+    <div class="gtop-row">
+      <div class="qbadge" id="qbadge">1/10</div>
+      <div class="player-pill" id="gpill"><span id="gpEm">🧔</span><span id="gpNm" style="font-size:.82rem;font-weight:800">Bố</span></div>
+      <div class="qbadge" id="timerNum" style="color:var(--c2);min-width:2rem;text-align:center">15</div>
+    </div>
+    <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+  </div>
+  <div class="qcard" id="qcard"><div class="qtext" id="qtext"></div></div>
+  <div class="opts" id="opts"></div>
+  <div class="score-strip" id="scoreStrip"></div>
+  <div class="pdots" id="pdots"></div>
+</div>
+
+<!-- RACE SCREEN (chế độ đối kháng) -->
+<div class="screen" id="raceScreen">
+  <div class="race-header" style="width:100%;max-width:480px">
+    <div class="race-qbadge" id="race-qbadge">Câu 1</div>
+    <div class="race-turn-pill" id="race-turn-pill">
+      <span id="race-turn-em">🧔</span>
+      <span id="race-turn-nm" style="font-size:.8rem">Bố trả lời</span>
+    </div>
+    <div class="race-timer-num" id="race-timer-num" style="color:var(--c2)">15</div>
+  </div>
+  <div class="race-track-wrap" id="raceTrack"></div>
+  <div class="race-timer-wrap"><div class="race-timer-bar" id="race-timer-bar"></div></div>
+  <div class="race-qcard" id="race-qcard"><div class="race-qtext" id="race-qtext"></div></div>
+  <div class="race-opts" id="race-opts"></div>
+</div>
+
+<!-- REVEAL SCREEN -->
+<div class="screen" id="revealScreen">
+  <div class="reveal-box">
+    <div style="font-size:3.5rem">🎉</div>
+    <div class="reveal-title">Tất cả đã<br>hoàn thành!</div>
+    <div style="color:var(--muted);font-size:.9rem;line-height:1.5">Điểm số vẫn đang được giữ bí mật...<br>Bạn đã sẵn sàng chưa?</div>
+    <div class="reveal-players" id="revealPlayers"></div>
+    <button class="btn btn-green" style="margin-top:.5rem" onclick="revealResult()">🏆 Xem kết quả!</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="resultScreen">
+  <div class="inner" style="align-items:center">
+    <div class="winner-banner" id="winnerBanner"></div>
+    <div class="podium-wrap" id="podium"></div>
+    <div class="result-note">🎊 Bảng xếp hạng cuối cùng</div>
+    <div class="lb-list" id="lbList"></div>
+    <div class="review-section" id="reviewSection"></div>
+    <div style="display:flex;flex-direction:column;gap:.55rem;width:100%;margin-top:.9rem">
+      <button class="btn btn-orange" onclick="playAgain()">🔄 Chơi lại</button>
+      <button class="btn btn-ghost" onclick="goHome()">🏠 Trang chủ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS_META={
+  tech:{name:"Công nghệ",emoji:"💻"},football:{name:"Bóng đá",emoji:"⚽"},
+  anime:{name:"Anime",emoji:"🎌"},science:{name:"Khoa học",emoji:"🔬"},
+  geography:{name:"Địa lý",emoji:"🗺️"},math:{name:"Toán học",emoji:"🔢"},
+  history:{name:"Lịch sử",emoji:"🏛️"},literature:{name:"Văn học",emoji:"📖"},
+  lifestyle:{name:"Đời sống",emoji:"🌿"},world:{name:"Thế giới",emoji:"🌍"},
+  space:{name:"Vũ trụ",emoji:"🚀"},music:{name:"Âm nhạc",emoji:"🎵"}
+};
+const ALL_Q={
+tech:[
+  {q:"Ai được coi là 'cha đẻ của máy tính hiện đại'?",o:["Alan Turing","Bill Gates","Steve Jobs","Linus Torvalds"],a:0},
+  {q:"Ngôn ngữ lập trình phổ biến nhất cho web phía client?",o:["Python","PHP","JavaScript","Ruby"],a:2},
+  {q:"RAM là viết tắt của gì?",o:["Random Access Memory","Read All Memory","Rapid Access Module","Remote Array Memory"],a:0},
+  {q:"CPU có nghĩa là gì?",o:["Bộ nhớ trong","Bộ xử lý trung tâm","Card đồ họa","Ổ cứng SSD"],a:1},
+  {q:"iPhone đầu tiên ra mắt năm nào?",o:["2005","2006","2007","2008"],a:2},
+  {q:"Đơn vị nào LỚN hơn Gigabyte?",o:["Megabyte","Kilobyte","Terabyte","Byte"],a:2},
+  {q:"Android được phát triển bởi công ty nào?",o:["Apple","Samsung","Google","Microsoft"],a:2},
+  {q:"'www' là viết tắt của gì?",o:["World Wide Web","Wide Web World","Web World Wide","Work With Web"],a:0},
+  {q:"Minecraft được tạo ra bởi ai?",o:["Notch (Markus Persson)","Gabe Newell","Shigeru Miyamoto","Hideo Kojima"],a:0},
+  {q:"Ngôn ngữ nào dùng để viết Linux?",o:["Java","Python","C","Assembly"],a:2},
+  {q:"Giao thức nào dùng để gửi email?",o:["HTTP","FTP","SMTP","SSH"],a:2},
+  {q:"Chip M1 do công ty nào tạo?",o:["Intel","AMD","NVIDIA","Apple"],a:3},
+  {q:"1 Terabyte = bao nhiêu Gigabyte?",o:["512 GB","1000 GB","1024 GB","2048 GB"],a:2},
+  {q:"Git dùng để làm gì?",o:["Vẽ đồ thị","Quản lý phiên bản code","Nén file","Kết nối mạng"],a:1},
+  {q:"'AI' là viết tắt của gì?",o:["Auto Interface","Artificial Intelligence","Advanced Internet","Autonomous Input"],a:1},
+  {q:"macOS thuộc công ty nào?",o:["Microsoft","Google","Apple","IBM"],a:2},
+  {q:"Python được tạo ra bởi ai?",o:["James Gosling","Guido van Rossum","Dennis Ritchie","Linus Torvalds"],a:1},
+  {q:"'Bluetooth' đặt tên theo ai?",o:["Một loài cá","Vua Harald Bluetooth của Đan Mạch","Nhà phát minh Đức","Tên vật liệu"],a:1},
+  {q:"NFT là viết tắt của gì?",o:["New Finance Token","Non-Fungible Token","Network File Transfer","Next Future Technology"],a:1},
+  {q:"USB-C khác USB-A điểm chính nào?",o:["Chậm hơn","Đầu cắm đối xứng 2 chiều","Chỉ dùng điện thoại","Không truyền dữ liệu"],a:1},
+  {q:"Ứng dụng nào KHÔNG thuộc Meta?",o:["Instagram","WhatsApp","Telegram","Threads"],a:2},
+  {q:"Phím tắt copy trên Windows?",o:["Ctrl+X","Ctrl+V","Ctrl+C","Ctrl+Z"],a:2},
+  {q:"Trình duyệt nào có thị phần lớn nhất?",o:["Firefox","Safari","Edge","Chrome"],a:3},
+  {q:"QR Code được phát minh ở đâu?",o:["Mỹ","Trung Quốc","Nhật Bản","Hàn Quốc"],a:2},
+  {q:"HDMI dùng để truyền gì?",o:["Chỉ âm thanh","Chỉ hình ảnh","Hình ảnh và âm thanh","Dữ liệu internet"],a:2},
+  {q:"'Cloud computing' nghĩa là gì?",o:["Máy tính năng lượng mặt trời","Lưu trữ và xử lý dữ liệu qua internet","Máy tính siêu nhỏ","Dự báo thời tiết"],a:1},
+  {q:"ChatGPT được phát triển bởi?",o:["Google","Meta","OpenAI","Microsoft"],a:2},
+  {q:"'Open source' có nghĩa là?",o:["Phần mềm miễn phí","Code công khai để ai xem/sửa","Không có bản quyền","Chỉ dùng Linux"],a:1},
+  {q:"GPU nổi tiếng nhất do công ty nào sản xuất?",o:["Intel","AMD","NVIDIA","Qualcomm"],a:2},
+  {q:"'5G' so với '4G' khác biệt chính là?",o:["Tiêu điện ít hơn","Tốc độ cao hơn và độ trễ thấp hơn","Phủ sóng rộng hơn","Chỉ dùng doanh nghiệp"],a:1},
+  {q:"Ngôn ngữ lập trình nào được dùng nhiều nhất cho trí tuệ nhân tạo (AI)?",o:["Java","C++","Python","JavaScript"],a:2},
+  {q:"'API' trong lập trình là viết tắt của gì?",o:["Application Programming Interface","Automated Program Index","Advanced Protocol Integration","Application Process Instruction"],a:0},
+  {q:"Hệ điều hành Linux được tạo ra năm nào?",o:["1985","1989","1991","1995"],a:2},
+  {q:"'SSD' khác 'HDD' ở điểm chính nào?",o:["SSD dung lượng lớn hơn","SSD không có bộ phận cơ học, nhanh hơn","SSD rẻ hơn HDD","SSD chỉ dùng cho laptop"],a:1},
+  {q:"Ngôn ngữ nào được dùng để tạo trang web tĩnh (nội dung)?",o:["Python","HTML","Java","C#"],a:1},
+  {q:"'Firewall' trong bảo mật máy tính dùng để làm gì?",o:["Tăng tốc độ internet","Ngăn chặn truy cập trái phép vào mạng","Sao lưu dữ liệu","Diệt virus"],a:1},
+  {q:"Công ty nào phát triển hệ điều hành iOS?",o:["Google","Microsoft","Samsung","Apple"],a:3},
+  {q:"'VPN' viết tắt của gì và dùng để làm gì?",o:["Very Private Network - tăng tốc mạng","Virtual Private Network - tạo kết nối mạng riêng tư và bảo mật","Visual Processing Node - xử lý đồ họa","Verified Public Network - mạng công cộng xác thực"],a:1},
+  {q:"Phần mềm độc hại tự sao chép và lây lan sang máy tính khác gọi là gì?",o:["Trojan","Virus","Spyware","Ransomware"],a:1},
+  {q:"'Điện toán lượng tử' (Quantum Computing) khác máy tính thông thường ở điểm chính nào?",o:["Chạy nhanh hơn vì chip tốt hơn","Dùng qubit thay vì bit, xử lý song song nhiều trạng thái cùng lúc","Không cần điện","Hoạt động dưới nước"],a:1}
+],
+football:[
+  {q:"Cầu thủ nào ghi nhiều bàn nhất lịch sử World Cup?",o:["Ronaldo Brazil","Just Fontaine","Miroslav Klose","Pelé"],a:2},
+  {q:"Quốc gia nào vô địch World Cup 2022?",o:["Brazil","Pháp","Croatia","Argentina"],a:3},
+  {q:"Quốc gia nào vô địch World Cup nhiều nhất (5 lần)?",o:["Đức","Ý","Brazil","Argentina"],a:2},
+  {q:"'Hat-trick' có nghĩa là gì?",o:["Thắng 3-0","1 cầu thủ ghi 3 bàn 1 trận","3 đường kiến tạo","Hòa 3 trận liên tiếp"],a:1},
+  {q:"Sân Camp Nou thuộc CLB nào?",o:["Real Madrid","Atletico Madrid","Barcelona","Valencia"],a:2},
+  {q:"Ballon d'Or là giải dành cho ai?",o:["HLV hay nhất","Cầu thủ hay nhất năm","CLB hay nhất","Thủ môn hay nhất"],a:1},
+  {q:"Messi đã giành bao nhiêu Ballon d'Or (đến 2023)?",o:["6","7","8","9"],a:2},
+  {q:"Premier League có bao nhiêu đội?",o:["18","20","22","24"],a:1},
+  {q:"Brazil được gọi là biệt danh gì?",o:["La Furia Roja","Seleção","Les Bleus","Die Mannschaft"],a:1},
+  {q:"World Cup 2026 tổ chức tại đâu?",o:["Úc & New Zealand","Qatar","Mỹ, Canada & Mexico","Anh"],a:2},
+  {q:"CLB nào vô địch Champions League nhiều nhất?",o:["Barcelona","Bayern Munich","AC Milan","Real Madrid"],a:3},
+  {q:"VAR là gì?",o:["Video Assistant Referee","Visual Action Replay","Video Analysis Review","Verified Action Referee"],a:0},
+  {q:"'El Clasico' là trận đấu giữa?",o:["Arsenal vs Chelsea","Barcelona vs Real Madrid","Bayern vs Dortmund","Milan vs Inter"],a:1},
+  {q:"Ai nắm kỷ lục 91 bàn trong 1 năm dương lịch?",o:["Messi","Ronaldo","Müller","Lewandowski"],a:0},
+  {q:"FIFA được thành lập năm nào?",o:["1900","1904","1930","1950"],a:1},
+  {q:"Khoảng cách từ chấm phạt đền đến khung thành?",o:["10m","11m","12m","13m"],a:1},
+  {q:"Manchester City thuộc thành phố nào?",o:["London","Liverpool","Manchester","Leeds"],a:2},
+  {q:"Trận bóng đá tiêu chuẩn kéo dài bao lâu?",o:["80 phút","90 phút","100 phút","120 phút"],a:1},
+  {q:"World Cup đầu tiên 1930 tổ chức ở đâu?",o:["Brazil","Pháp","Ý","Uruguay"],a:3},
+  {q:"Thẻ vàng thứ 2 trong 1 trận dẫn đến điều gì?",o:["Phạt tiền","Thẻ đỏ gián tiếp - rời sân","Chỉ cảnh cáo","Đá phạt"],a:1},
+  {q:"Chiều rộng khung thành tiêu chuẩn?",o:["6.4m","7.32m","8m","7m"],a:1},
+  {q:"Ronaldo (CR7) sinh ra ở đảo nào?",o:["Azores","Lisbon","Madeira","Porto"],a:2},
+  {q:"Cầu thủ ghi bàn nhanh nhất World Cup (11 giây)?",o:["Hakan Şükür","Robbie Fowler","Thierry Henry","Michael Owen"],a:0},
+  {q:"Lỗi việt vị xảy ra khi nào?",o:["Chạm tay vào bóng","Ở gần khung thành hơn cầu thủ đối phương cuối","Ra ngoài sân","Vào vùng cấm địa"],a:1},
+  {q:"C1 đổi tên thành Champions League năm nào?",o:["1990","1992","1995","1998"],a:1},
+  {q:"Công Phượng từng chơi ở CLB nào tại Hàn Quốc?",o:["Jeonbuk","Incheon United","Busan","Ulsan"],a:1},
+  {q:"Ai ghi bàn vàng giúp Pháp vô địch World Cup 1998?",o:["Zidane","Henry","Petit","Desailly"],a:0},
+  {q:"Khi hòa sau 90 phút play-off tiếp theo là gì?",o:["Đá luân lưu ngay","Hiệp phụ 30 phút rồi luân lưu","Xác định bằng thẻ vàng","Tung đồng xu"],a:1},
+  {q:"World Cup 2018 tổ chức ở đâu?",o:["Brazil","Đức","Pháp","Nga"],a:3},
+  {q:"Cầu thủ nào được gọi là 'O Fenômeno'?",o:["Pelé","Ronaldo Brazil","Ronaldinho","Romário"],a:1},
+  {q:"Giải bóng đá La Liga thuộc quốc gia nào?",o:["Ý","Pháp","Tây Ban Nha","Đức"],a:2},
+  {q:"CLB nào được mệnh danh 'Quỷ đỏ' trong bóng đá Anh?",o:["Liverpool","Arsenal","Chelsea","Manchester United"],a:3},
+  {q:"Ronaldo (CR7) đang thi đấu cho đội tuyển quốc gia nào?",o:["Tây Ban Nha","Anh","Bồ Đào Nha","Pháp"],a:2},
+  {q:"Năm 2023, Messi gia nhập CLB nào tại Mỹ?",o:["LA Galaxy","New York City FC","Inter Miami","Atlanta United"],a:2},
+  {q:"Serie A là giải bóng đá hàng đầu của quốc gia nào?",o:["Pháp","Ý","Tây Ban Nha","Đức"],a:1},
+  {q:"Cầu thủ nào giữ kỷ lục ra sân nhiều nhất cho đội tuyển nam quốc gia?",o:["Messi","Ronaldo","Ahmed Hassan","Cristiano Ronaldo"],a:3},
+  {q:"World Cup 2022 Qatar có bao nhiêu đội tham dự?",o:["24","28","32","36"],a:2},
+  {q:"Bàn thắng bằng tay được gọi là 'Hand of God' thuộc về cầu thủ nào?",o:["Pelé","Ronaldo","Maradona","Zidane"],a:2},
+  {q:"CLB Barcelona có biệt danh là gì?",o:["Los Blancos","Los Colchoneros","El Barça / Blaugrana","Los Merengues"],a:2},
+  {q:"Tiền đạo nào ghi nhiều bàn nhất trong một mùa giải Champions League?",o:["Messi","Ronaldo","Lewandowski","Benzema"],a:1}
+],
+anime:[
+  {q:"Luffy trong One Piece có siêu năng lực gì?",o:["Kiểm soát lửa","Cơ thể cao su","Tàng hình","Bay được"],a:1},
+  {q:"Studio Ghibli nổi tiếng với phim nào?",o:["Dragon Ball Z","Spirited Away","One Piece","Demon Slayer"],a:1},
+  {q:"Doraemon đến từ thế kỷ nào?",o:["21st","22nd","23rd","24th"],a:1},
+  {q:"Ai đạo diễn Spirited Away?",o:["Satoshi Kon","Makoto Shinkai","Hayao Miyazaki","Isao Takahata"],a:2},
+  {q:"Goku trong Dragon Ball Z thuộc tộc nào?",o:["Namekian","Human","Saiyan","Android"],a:2},
+  {q:"Demon Slayer bối cảnh thời đại nào?",o:["Thời Edo","Thời Meiji","Thời Taisho","Thời Showa"],a:2},
+  {q:"Pokémon ra mắt lần đầu năm nào?",o:["1993","1996","1998","2001"],a:1},
+  {q:"Nhạc mở đầu Attack on Titan là bài gì?",o:["Gurenge","Guren no Yumiya","Unravel","My Hero"],a:1},
+  {q:"Tokyo Ghoul kể về loại sinh vật nào?",o:["Vampire","Zombie","Ghoul","Werewolf"],a:2},
+  {q:"Naruto thuộc làng ninja nào?",o:["Làng Cát","Làng Sương","Làng Lá","Làng Đá"],a:2},
+  {q:"'Plus Ultra!' là câu thoại trong anime nào?",o:["Naruto","My Hero Academia","Black Clover","Fairy Tail"],a:1},
+  {q:"Death Note - cuốn sổ có khả năng gì?",o:["Biết tương lai","Triệu hồi thần linh","Giết người được viết tên","Thực hiện điều ước"],a:2},
+  {q:"Nhân vật chính trong Fullmetal Alchemist?",o:["Roy Mustang","Edward Elric","Alphonse Elric","Winry Rockbell"],a:1},
+  {q:"Pikachu thuộc type gì trong Pokémon?",o:["Fire","Water","Electric","Grass"],a:2},
+  {q:"Tên thật của L trong Death Note?",o:["Lawliet","Lawson","Lawrence","Lambert"],a:0},
+  {q:"Levi Ackerman thuộc anime nào?",o:["Naruto","Demon Slayer","Attack on Titan","Jujutsu Kaisen"],a:2},
+  {q:"'Mangaka' là nghề gì?",o:["Họa sĩ vẽ manga","Lồng tiếng anime","Đạo diễn anime","Nhà sản xuất game"],a:0},
+  {q:"Saitama đánh bại kẻ thù bằng mấy cú đấm?",o:["3","2","1","10"],a:2},
+  {q:"Gojo Satoru có kỹ thuật đặc biệt gì?",o:["Hỏa Thuật","Vô Hạn (Infinity)","Nguyền Linh Xác","Điểm Kỳ Dị"],a:1},
+  {q:"Biểu tượng của Ghibli là con vật gì?",o:["Mèo","Totoro","Rồng","Chó sói"],a:1},
+  {q:"'Isekai' có nghĩa là gì?",o:["Thế giới dưới nước","Chuyển sinh sang thế giới khác","Trở về quá khứ","Du hành vũ trụ"],a:1},
+  {q:"Tổ chức ác trong Naruto tên là gì?",o:["Otogakure","Akatsuki","ANBU","Sound Five"],a:1},
+  {q:"'Haki' trong One Piece là gì?",o:["Loại trái ác quỷ","Kiếm thuật đặc biệt","Năng lực tinh thần tiềm ẩn","Kỹ thuật bơi lội"],a:2},
+  {q:"Game VR đầu tiên trong Sword Art Online tên là gì?",o:["ALfheim Online","Gun Gale Online","Sword Art Online","Project Alicization"],a:2},
+  {q:"Miyazaki nhận Oscar năm nào?",o:["2001","2003","2005","2007"],a:1},
+  {q:"'Otaku' ở Nhật ban đầu có nghĩa là gì?",o:["Người cuồng anime/game","Võ sĩ sumo","Đầu bếp","Nhà sư"],a:0},
+  {q:"'Nen' xuất hiện trong anime nào?",o:["Dragon Ball","Naruto","Hunter x Hunter","Black Clover"],a:2},
+  {q:"Sailor Moon có tên thật là gì?",o:["Rei Hino","Minako Aino","Usagi Tsukino","Ami Mizuno"],a:2},
+  {q:"Tên tiếng Anh của 'Boku no Hero Academia'?",o:["My Hero World","Hero Academia","My Hero Academia","Super Hero School"],a:2},
+  {q:"Super Saiyan lần đầu xuất hiện ở chiến trường nào?",o:["Trái Đất","Namek","Thiên đường","Cell Games"],a:1},
+  {q:"Nhân vật Tanjiro trong Demon Slayer có kỹ năng đặc biệt nào?",o:["Kiểm soát lửa","Hơi thở Nước và Nhật Mặt Trời","Bay trong không khí","Biến hình"],a:1},
+  {q:"Anime 'Neon Genesis Evangelion' kể về điều gì?",o:["Samurai chiến đấu quái vật","Phi công robot khổng lồ chiến đấu quái vật","Ninja trong thế giới tương lai","Phép thuật trường học"],a:1},
+  {q:"Nhân vật Zenitsu trong Demon Slayer dùng hơi thở gì?",o:["Hơi thở Nước","Hơi thở Lửa","Hơi thở Sấm","Hơi thở Đất"],a:2},
+  {q:"Studio nào sản xuất anime 'Demon Slayer'?",o:["Madhouse","Ufotable","A-1 Pictures","Bones"],a:1},
+  {q:"Trong 'Fullmetal Alchemist', quy tắc nền tảng của giả kim thuật là gì?",o:["Mạnh được yếu thua","Trao đổi tương đương","Sức mạnh tuyệt đối","Tri thức là sức mạnh"],a:1},
+  {q:"Anime 'Your Name' (Kimi no Na wa) được đạo diễn bởi ai?",o:["Hayao Miyazaki","Satoshi Kon","Makoto Shinkai","Mamoru Hosoda"],a:2},
+  {q:"'Jojo's Bizarre Adventure' nổi tiếng với hệ thống sức mạnh nào?",o:["Chakra","Nen","Stand (Hào quang)","Alchemy"],a:2},
+  {q:"Trong 'Naruto', nhóm 7 ban đầu gồm những ai?",o:["Naruto, Sasuke, Sakura, Kakashi","Naruto, Sasuke, Sakura, Yamato","Naruto, Neji, Rock Lee, Tenten","Naruto, Kiba, Shino, Hinata"],a:0},
+  {q:"Anime 'One Punch Man' được làm từ webcomic của tác giả nào?",o:["Tatsuki Fujimoto","ONE","Yusuke Murata","Hajime Isayama"],a:1},
+  {q:"Trong 'Dragon Ball Z', sinh vật nào được coi là mạnh nhất vũ trụ (ban đầu)?",o:["Frieza","Cell","Majin Buu","Beerus"],a:0}
+],
+science:[
+  {q:"Hành tinh nào lớn nhất Hệ Mặt Trời?",o:["Saturn","Neptune","Jupiter","Uranus"],a:2},
+  {q:"Tốc độ ánh sáng xấp xỉ bao nhiêu km/giây?",o:["150.000","300.000","500.000","1.000.000"],a:1},
+  {q:"Ký hiệu hóa học của vàng?",o:["Go","Gd","Au","Ag"],a:2},
+  {q:"Nguyên tố nào chiếm nhiều nhất trong không khí?",o:["Oxy","Carbon dioxide","Nitơ","Argon"],a:2},
+  {q:"Loài nào có ADN gần nhất với người?",o:["Chó","Cá heo","Tinh tinh","Voi"],a:2},
+  {q:"Mặt Trăng quay quanh Trái Đất mất bao lâu?",o:["7 ngày","14 ngày","~27.3 ngày","30 ngày"],a:2},
+  {q:"Nước sôi ở bao nhiêu độ C?",o:["90°C","95°C","100°C","105°C"],a:2},
+  {q:"Lực nào giữ hành tinh quay quanh Mặt Trời?",o:["Lực từ","Lực điện","Lực hấp dẫn","Lực quán tính"],a:2},
+  {q:"Bộ phận nào của cây thực hiện quang hợp?",o:["Rễ","Thân","Lá","Hoa"],a:2},
+  {q:"DNA là viết tắt của gì?",o:["Deoxyribonucleic Acid","Di-Nucleic Acid","Dextrose-Nucleic Atom","Dynamic Nucleic Array"],a:0},
+  {q:"Hành tinh nào có vành đai nổi tiếng nhất?",o:["Jupiter","Uranus","Neptune","Saturn"],a:3},
+  {q:"Âm thanh truyền nhanh nhất trong môi trường nào?",o:["Chân không","Không khí","Nước","Kim loại"],a:3},
+  {q:"0 Kelvin bằng bao nhiêu độ Celsius?",o:["-100°C","-173°C","-273°C","-373°C"],a:2},
+  {q:"Photon là hạt của bức xạ nào?",o:["Âm thanh","Nhiệt","Ánh sáng/điện từ","Hấp dẫn"],a:2},
+  {q:"Nguyên tố có số nguyên tử là 1?",o:["Helium","Lithium","Hydrogen","Carbon"],a:2},
+  {q:"Thuyết tương đối đặc biệt do ai đề xuất?",o:["Newton","Bohr","Einstein","Hawking"],a:2},
+  {q:"Khí nào làm nước có gas có bọt?",o:["Oxy","Nitơ","CO2","Hydrogen"],a:2},
+  {q:"Mặt Trời chủ yếu gồm nguyên tố nào?",o:["Oxy","Helium và Hydrogen","Carbon","Sắt"],a:1},
+  {q:"Phản ứng trong lò hạt nhân là loại nào?",o:["Tổng hợp fusion","Phân hạch fission","Đốt cháy","Hóa học"],a:1},
+  {q:"Nguyệt thực xảy ra khi nào?",o:["Mặt Trăng che Mặt Trời","Trái Đất nằm giữa Mặt Trời và Mặt Trăng","Mặt Trời sau Trái Đất","Mặt Trăng xa nhất"],a:1},
+  {q:"Bộ phận nào sản xuất insulin?",o:["Gan","Thận","Tuyến tụy","Lách"],a:2},
+  {q:"Vận tốc âm thanh trong không khí 20°C?",o:["200 m/s","343 m/s","500 m/s","700 m/s"],a:1},
+  {q:"Thuyết tiến hóa do ai đề xuất?",o:["Gregor Mendel","Charles Darwin","Louis Pasteur","Isaac Newton"],a:1},
+  {q:"Kim cương chủ yếu từ nguyên tố nào?",o:["Silicon","Carbon","Oxygen","Nitrogen"],a:1},
+  {q:"Quang hợp giúp cây chuyển đổi gì thành năng lượng?",o:["Nước","Ánh sáng mặt trời","CO2","Chất khoáng"],a:1},
+  {q:"Hành tinh nào có một ngày dài hơn một năm?",o:["Mars","Mercury","Venus","Saturn"],a:2},
+  {q:"Trái Đất tự quay quanh trục mất bao lâu?",o:["12 giờ","24 giờ","48 giờ","36 giờ"],a:1},
+  {q:"Tế bào vi khuẩn thuộc loại nào?",o:["Eukaryote","Prokaryote","Archaea","Plasmid"],a:1},
+  {q:"'Neutron' có điện tích gì?",o:["Dương","Âm","Trung hòa","Thay đổi"],a:2},
+  {q:"Nguyên tố nào chiếm nhiều nhất trong vỏ Trái Đất?",o:["Silicon","Sắt","Nhôm","Oxy"],a:3},
+  {q:"Hiện tượng 'cực quang' (Aurora) xuất hiện do nguyên nhân gì?",o:["Ánh sáng mặt trời phản chiếu","Hạt tích điện từ mặt trời va chạm với khí quyển","Tia sét ở tầng cao","Phản xạ ánh trăng"],a:1},
+  {q:"Xương cứng nhất trong cơ thể người là xương nào?",o:["Xương đùi","Xương hàm","Men răng (không phải xương)","Xương sọ"],a:2},
+  {q:"'Phản ứng dây chuyền' trong vật lý hạt nhân xảy ra khi nào?",o:["Một neutron kích hoạt phân hạch tạo thêm neutron kích hoạt phân hạch khác","Hai hạt nhân kết hợp lại","Electron bị tách khỏi nguyên tử","Proton va chạm với neutron"],a:0},
+  {q:"Chim nào có thể bay nhanh nhất thế giới?",o:["Đại bàng","Hải âu","Cắt lớn (Peregrine Falcon)","Yến"],a:2},
+  {q:"'Áp suất khí quyển' tiêu chuẩn ở mực nước biển là bao nhiêu?",o:["1 atm (101.325 Pa)","2 atm","0.5 atm","10 atm"],a:0},
+  {q:"Tế bào nào trong máu có chức năng vận chuyển oxy?",o:["Bạch cầu","Tiểu cầu","Hồng cầu","Tế bào plasma"],a:2},
+  {q:"'Định luật Ohm' trong điện học phát biểu mối quan hệ giữa?",o:["Điện áp, điện trở và cường độ dòng điện","Lực, khối lượng và gia tốc","Năng lượng, công suất và thời gian","Nhiệt độ, áp suất và thể tích"],a:0},
+  {q:"Loài nào có thể tái tạo lại các chi bị mất?",o:["Cá heo","Thằn lằn (một số loài)","Ếch","Rùa"],a:1},
+  {q:"Trong bảng tuần hoàn, các nguyên tố trong cùng một cột (nhóm) có điểm chung gì?",o:["Cùng số neutron","Cùng số electron hóa trị","Cùng khối lượng nguyên tử","Cùng trạng thái vật chất"],a:1},
+  {q:"'Tốc độ âm thanh' (Mach 1) trong không khí ở 20°C là bao nhiêu?",o:["243 m/s","343 m/s","443 m/s","543 m/s"],a:1}
+],
+geography:[
+  {q:"Thủ đô của Nhật Bản?",o:["Osaka","Kyoto","Hiroshima","Tokyo"],a:3},
+  {q:"Sông dài nhất thế giới?",o:["Amazon","Mississippi","Nile","Yangtze"],a:2},
+  {q:"Núi cao nhất thế giới?",o:["K2","Kangchenjunga","Everest","Lhotse"],a:2},
+  {q:"Quốc gia có diện tích lớn nhất?",o:["Trung Quốc","Canada","Mỹ","Nga"],a:3},
+  {q:"Thủ đô của Úc?",o:["Sydney","Melbourne","Brisbane","Canberra"],a:3},
+  {q:"Đại dương nào lớn nhất?",o:["Đại Tây Dương","Ấn Độ Dương","Bắc Băng Dương","Thái Bình Dương"],a:3},
+  {q:"Tháp Eiffel ở thành phố nào?",o:["London","Berlin","Rome","Paris"],a:3},
+  {q:"Châu lục nào nhiều quốc gia nhất?",o:["Châu Á","Châu Âu","Châu Mỹ","Châu Phi"],a:3},
+  {q:"Quốc gia nổi tiếng với Kim tự tháp?",o:["Iraq","Mexico","Peru","Ai Cập"],a:3},
+  {q:"Hồ nước ngọt lớn nhất thế giới?",o:["Hồ Superior","Hồ Baikal","Hồ Victoria","Hồ Caspian"],a:0},
+  {q:"Thủ đô của Brazil?",o:["Rio de Janeiro","São Paulo","Brasília","Salvador"],a:2},
+  {q:"Quốc gia nào có dân số đông nhất (2024)?",o:["Trung Quốc","Ấn Độ","Mỹ","Indonesia"],a:1},
+  {q:"Sa mạc Sahara ở châu lục nào?",o:["Châu Á","Châu Mỹ","Châu Phi","Châu Đại Dương"],a:2},
+  {q:"Quốc gia nhỏ nhất thế giới?",o:["Monaco","San Marino","Liechtenstein","Vatican"],a:3},
+  {q:"Thủ đô của Canada?",o:["Toronto","Vancouver","Ottawa","Montreal"],a:2},
+  {q:"Kênh đào nối Đại Tây Dương và Thái Bình Dương?",o:["Kênh Suez","Kênh Panama","Kênh Corinth","Kênh Kiel"],a:1},
+  {q:"Thủ đô của Hàn Quốc?",o:["Busan","Incheon","Daegu","Seoul"],a:3},
+  {q:"Sông Amazon chủ yếu qua quốc gia nào?",o:["Colombia","Peru","Venezuela","Brazil"],a:3},
+  {q:"Thủ đô của Đức?",o:["Munich","Hamburg","Frankfurt","Berlin"],a:3},
+  {q:"Quốc kỳ Nhật Bản có hình gì?",o:["Ngôi sao vàng nền đỏ","Chữ thập đỏ","Vòng tròn đỏ nền trắng","Sọc đỏ trắng"],a:2},
+  {q:"Biển Chết nổi tiếng vì điều gì?",o:["Sâu nhất thế giới","Độ mặn cực cao không sinh vật","Nhiều bão nhất","Trong xanh nhất"],a:1},
+  {q:"Núi lửa Vesuvius phá hủy thành phố nào?",o:["Rome","Pompeii","Naples","Athens"],a:1},
+  {q:"Quốc gia nào gồm hơn 17.000 đảo?",o:["Philippines","Nhật Bản","Indonesia","Maldives"],a:2},
+  {q:"Đường xích đạo chia Trái Đất thành 2 bán cầu nào?",o:["Đông và Tây","Bắc và Nam","Trong và Ngoài","Trên và Dưới"],a:1},
+  {q:"Thành phố nào mệnh danh 'Thành phố sương mù'?",o:["Amsterdam","London","Brussels","Copenhagen"],a:1},
+  {q:"Fjord đặc trưng của quốc gia nào?",o:["Đan Mạch","Phần Lan","Na Uy","Thụy Điển"],a:2},
+  {q:"Quốc gia nào có đường bờ biển dài nhất?",o:["Nga","Mỹ","Canada","Úc"],a:2},
+  {q:"Hoàng Sa và Trường Sa thuộc biển nào?",o:["Biển Đông","Biển Ả Rập","Vịnh Bengal","Biển Philippines"],a:0},
+  {q:"Thủ đô của Việt Nam?",o:["TP. Hồ Chí Minh","Đà Nẵng","Huế","Hà Nội"],a:3},
+  {q:"Châu Á chiếm bao nhiêu % đất liền Trái Đất?",o:["20%","30%","40%","50%"],a:1},
+  {q:"Thành phố nào được gọi là 'Thành phố không ngủ'?",o:["Tokyo","Paris","New York","Dubai"],a:2},
+  {q:"Con sông nào chảy qua Paris?",o:["Rhine","Thames","Seine","Danube"],a:2},
+  {q:"Quốc gia nào có nhiều ngôn ngữ chính thức nhất?",o:["Ấn Độ","Nam Phi","Thụy Sĩ","Bolivia"],a:1},
+  {q:"Đỉnh núi nào cao thứ 2 thế giới?",o:["Kangchenjunga","Lhotse","K2","Makalu"],a:2},
+  {q:"Thủ đô của Argentina là thành phố nào?",o:["São Paulo","Santiago","Lima","Buenos Aires"],a:3},
+  {q:"Biển hồ Caspian là biển hay hồ?",o:["Biển vì nước mặn","Hồ vì bị bao quanh hoàn toàn bởi đất liền","Vừa là biển vừa là hồ","Không phải cả hai"],a:1},
+  {q:"Quốc gia nào nằm trên cả hai châu lục?",o:["Ai Cập","Thổ Nhĩ Kỳ","Israel","Iran"],a:1},
+  {q:"Thủ đô của New Zealand là thành phố nào?",o:["Auckland","Christchurch","Wellington","Hamilton"],a:2},
+  {q:"Rừng nhiệt đới Amazon chiếm bao nhiêu % rừng nhiệt đới thế giới?",o:["30%","40%","50%","60%"],a:2},
+  {q:"Quốc gia nào có đường biên giới đất liền dài nhất thế giới?",o:["Nga","Trung Quốc","Mỹ","Brazil"],a:0}
+],
+math:[
+  {q:"Số Pi (π) xấp xỉ bằng?",o:["3.14","3.16","3.12","3.18"],a:0},
+  {q:"Căn bậc hai của 144?",o:["11","12","13","14"],a:1},
+  {q:"Trong tam giác vuông, cạnh huyền là?",o:["Cạnh ngắn nhất","Cạnh đối diện góc vuông","Cạnh kề góc vuông","Cạnh bất kỳ"],a:1},
+  {q:"0! (0 giai thừa) bằng?",o:["0","1","Không xác định","Vô cực"],a:1},
+  {q:"Số Fibonacci tiếp theo sau 13?",o:["18","20","21","25"],a:2},
+  {q:"Tổng các góc trong tam giác?",o:["90°","180°","270°","360°"],a:1},
+  {q:"Số chia hết cho 9 khi nào?",o:["Tận cùng là 9","Tổng chữ số chia hết cho 9","Là số chẵn","Chia hết cho 3"],a:1},
+  {q:"log₁₀(1000) = ?",o:["2","3","4","10"],a:1},
+  {q:"Số nguyên tố nhỏ nhất?",o:["0","1","2","3"],a:2},
+  {q:"Số 1010 nhị phân = bao nhiêu thập phân?",o:["8","10","12","14"],a:1},
+  {q:"x² - 9 = 0 có nghiệm là?",o:["x=3","x=±3","x=9","x=±9"],a:1},
+  {q:"Tổng 1+2+3+...+100 = ?",o:["5000","5050","4950","5100"],a:1},
+  {q:"Đa giác đều 8 cạnh gọi là gì?",o:["Lục giác","Thất giác","Bát giác","Ngũ giác"],a:2},
+  {q:"Chu vi hình vuông cạnh 7 cm?",o:["14cm","21cm","28cm","49cm"],a:2},
+  {q:"y = x² có đồ thị hình gì?",o:["Đường thẳng","Đường tròn","Parabol","Hypebol"],a:2},
+  {q:"Xác suất tung 3 đồng tiền đều ngửa?",o:["1/4","1/6","1/8","1/3"],a:2},
+  {q:"(a+b)² = ?",o:["a²+b²","a²+2ab+b²","a²-2ab+b²","2a+2b"],a:1},
+  {q:"Số hoàn hảo đầu tiên?",o:["6","12","28","496"],a:0},
+  {q:"Trung vị của {3,7,1,9,4}?",o:["3","4","5","7"],a:1},
+  {q:"2^10 = ?",o:["512","1000","1024","2048"],a:2},
+  {q:"ax+b=0 (a≠0) có bao nhiêu nghiệm?",o:["0","1","2","Vô số"],a:1},
+  {q:"Diện tích hình thang = ?",o:["(a+b)×h","½×(a+b)×h","a×b×h","(a+b)÷2"],a:1},
+  {q:"sin(90°) = ?",o:["0","0.5","√2/2","1"],a:3},
+  {q:"Số nào không phải nguyên tố: 2, 7, 9, 11?",o:["2","7","9","11"],a:2},
+  {q:"Thể tích hình hộp 4×3×5?",o:["40","50","60","70"],a:2},
+  {q:"Góc bù của 70°?",o:["20°","110°","290°","70°"],a:1},
+  {q:"|−15| = ?",o:["-15","0","15","225"],a:2},
+  {q:"Tập hợp N bắt đầu từ số nào?",o:["−1","0","1","Không có số đầu"],a:1},
+  {q:"Diện tích hình tròn bán kính 5?",o:["25π","10π","5π","50π"],a:0},
+  {q:"Vector là đại lượng có yếu tố gì?",o:["Chỉ độ lớn","Độ lớn và hướng","Hướng và điểm đặt","Cả độ lớn hướng điểm đặt"],a:3},
+  {q:"Tam giác đều có 3 góc bằng nhau, mỗi góc bằng bao nhiêu?",o:["45°","60°","72°","90°"],a:1},
+  {q:"Giá trị của e (số Euler) xấp xỉ bằng bao nhiêu?",o:["1.618","2.718","3.141","1.414"],a:1},
+  {q:"Nếu f(x) = x², thì đạo hàm f'(x) bằng bao nhiêu?",o:["x","2x","x²","2x²"],a:1},
+  {q:"'Số vô tỉ' là số như thế nào?",o:["Số không chia hết cho 2","Số không thể biểu diễn dưới dạng phân số p/q","Số âm","Số lớn hơn 1 triệu"],a:1},
+  {q:"Tổng các góc ngoài của bất kỳ đa giác lồi nào bằng bao nhiêu?",o:["180°","270°","360°","720°"],a:2},
+  {q:"5! (5 giai thừa) = ?",o:["25","60","120","240"],a:2},
+  {q:"Diện tích tam giác có đáy 8 cm và chiều cao 5 cm là?",o:["13 cm²","20 cm²","40 cm²","80 cm²"],a:1},
+  {q:"Nghiệm của hệ phương trình: x+y=5 và x-y=1 là?",o:["x=2, y=3","x=3, y=2","x=4, y=1","x=1, y=4"],a:1},
+  {q:"'Số nguyên tố' lớn nhất trong khoảng từ 1 đến 20 là?",o:["17","18","19","20"],a:2},
+  {q:"Trong thống kê, 'độ lệch chuẩn' (standard deviation) đo lường điều gì?",o:["Giá trị trung bình của tập số liệu","Mức độ phân tán của dữ liệu xung quanh giá trị trung bình","Giá trị lớn nhất trừ giá trị nhỏ nhất","Tổng các giá trị chia cho số phần tử"],a:1}
+],
+history:[
+  {q:"Thế chiến I bắt đầu năm nào?",o:["1910","1914","1918","1920"],a:1},
+  {q:"Ai phát minh ra máy in (~1440)?",o:["Leonardo da Vinci","Johannes Gutenberg","Galileo","Isaac Newton"],a:1},
+  {q:"Tây La Mã sụp đổ năm nào?",o:["276","376","476","576"],a:2},
+  {q:"Cách mạng Pháp bắt đầu năm nào?",o:["1776","1789","1799","1804"],a:1},
+  {q:"Bức tường Berlin sụp đổ năm nào?",o:["1985","1987","1989","1991"],a:2},
+  {q:"Ai đầu tiên đặt chân lên Mặt Trăng?",o:["Yuri Gagarin","Buzz Aldrin","Neil Armstrong","Michael Collins"],a:2},
+  {q:"Chiến tranh Việt Nam kết thúc ngày nào?",o:["30/4/1973","30/4/1974","30/4/1975","30/4/1976"],a:2},
+  {q:"Napoleon sinh ra ở đâu?",o:["Pháp lục địa","Đảo Sardinia","Đảo Corsica","Ý"],a:2},
+  {q:"Đế quốc Mông Cổ đạt đỉnh cao dưới thời ai?",o:["Genghis Khan","Kublai Khan","Timur","Ögedei Khan"],a:0},
+  {q:"Hiệp ước nào kết thúc Thế chiến I?",o:["Versailles","Paris","Berlin","Geneva"],a:0},
+  {q:"Ai phát hiện ra châu Mỹ năm 1492?",o:["Amerigo Vespucci","Magellan","Christopher Columbus","Vasco da Gama"],a:2},
+  {q:"Triều đại phong kiến dài nhất lịch sử Việt Nam?",o:["Nhà Lý","Nhà Trần","Nhà Nguyễn","Nhà Lê"],a:3},
+  {q:"Cách mạng công nghiệp bắt đầu ở đâu?",o:["Pháp","Đức","Anh","Mỹ"],a:2},
+  {q:"Ai viết Tuyên ngôn Độc lập Mỹ 1776?",o:["Washington","Franklin","Thomas Jefferson","John Adams"],a:2},
+  {q:"Ai lãnh đạo Cách mạng tháng Mười Nga 1917?",o:["Stalin","Trotsky","Lenin","Kerensky"],a:2},
+  {q:"Thế chiến II kết thúc năm nào?",o:["1943","1944","1945","1946"],a:2},
+  {q:"Hoàng đế đầu tiên của Trung Quốc thống nhất?",o:["Hán Vũ Đế","Tần Thủy Hoàng","Chu Văn Vương","Đường Thái Tông"],a:1},
+  {q:"Hồ Chí Minh đọc Tuyên ngôn Độc lập năm nào?",o:["1943","1944","1945","1946"],a:2},
+  {q:"Kim tự tháp Giza xây dựng khoảng năm nào?",o:["500 TCN","1500 TCN","2560 TCN","3500 TCN"],a:2},
+  {q:"Thập tự chinh là cuộc chiến vì mục đích gì?",o:["Chinh phục Trung Quốc","Giành Jerusalem từ Hồi giáo","Đánh Mông Cổ","Thống nhất châu Âu"],a:1},
+  {q:"Ai phát minh ra điện thoại?",o:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Marconi"],a:2},
+  {q:"Hiệp ước Geneva 1954 chia cắt VN ở vĩ tuyến nào?",o:["13","15","17","19"],a:2},
+  {q:"Ai ám sát Archduke Franz Ferdinand?",o:["Điệp viên Đức","Gavrilo Princip (Serbia)","Người Áo cực đoan","Điệp viên Nga"],a:1},
+  {q:"D-Day trong Thế chiến II diễn ra ở đâu?",o:["Bờ biển Na Uy","Bờ biển Ý","Normandy Pháp","Bờ biển Hà Lan"],a:2},
+  {q:"Tổng thống đầu tiên của nước Mỹ?",o:["John Adams","Benjamin Franklin","Thomas Jefferson","George Washington"],a:3},
+  {q:"Pharaoh nữ nổi tiếng nhất Ai Cập cổ đại?",o:["Nefertiti","Cleopatra","Hatshepsut","Isis"],a:1},
+  {q:"Magna Carta ký kết ở đâu, năm nào?",o:["Pháp 1200","Anh 1215","Đức 1250","Ý 1300"],a:1},
+  {q:"Thành Cát Tư Hãn mất năm nào?",o:["1205","1215","1227","1240"],a:2},
+  {q:"Đế quốc Ottoman sụp đổ năm nào?",o:["1918","1920","1922","1924"],a:2},
+  {q:"Con đường tơ lụa nối Trung Quốc qua đâu?",o:["Ấn Độ Dương","Trung Á","Biển Đen","Biển Đỏ"],a:1},
+  {q:"Đế quốc La Mã được chia thành Đông và Tây vào năm nào?",o:["285 SCN","330 SCN","395 SCN","410 SCN"],a:2},
+  {q:"Cuộc chiến tranh 'Trăm năm' diễn ra giữa hai quốc gia nào?",o:["Anh và Đức","Pháp và Anh","Tây Ban Nha và Bồ Đào Nha","Pháp và Đức"],a:1},
+  {q:"Ai là người phát minh ra điện bóng đèn?",o:["Nikola Tesla","Benjamin Franklin","Thomas Edison","Alexander Graham Bell"],a:2},
+  {q:"Cách mạng công nghiệp lần thứ 2 gắn liền với phát minh nào?",o:["Máy hơi nước","Điện và dầu mỏ","Internet","Máy tính"],a:1},
+  {q:"Thành phố nào là thủ đô đầu tiên của nước Mỹ?",o:["Boston","New York","Philadelphia","Washington D.C."],a:1},
+  {q:"'Chiến dịch Overlord' trong Thế chiến II là gì?",o:["Tấn công Trân Châu Cảng","Chiến dịch đổ bộ Normandy (D-Day)","Ném bom nguyên tử Hiroshima","Chiến dịch giải phóng Paris"],a:1},
+  {q:"Ai là nữ hoàng trị vì lâu nhất lịch sử Anh?",o:["Victoria","Elizabeth I","Elizabeth II","Mary I"],a:2},
+  {q:"Phong trào 'Phục Hưng' (Renaissance) bắt đầu ở quốc gia nào?",o:["Pháp","Đức","Ý","Tây Ban Nha"],a:2},
+  {q:"Chiến tranh Triều Tiên kết thúc năm nào (đình chiến)?",o:["1950","1951","1953","1955"],a:2},
+  {q:"Ai là vị pharaoh nổi tiếng nhất của Ai Cập cổ đại, trị vì khoảng 1279-1213 TCN?",o:["Tutankhamun","Akhenaten","Ramesses II","Thutmose III"],a:2}
+],
+literature:[
+  {q:"Ai viết 'Truyện Kiều'?",o:["Hồ Xuân Hương","Nguyễn Du","Nguyễn Đình Chiểu","Tú Xương"],a:1},
+  {q:"'Romeo và Juliet' do ai viết?",o:["Charles Dickens","Shakespeare","Victor Hugo","Jane Austen"],a:1},
+  {q:"'Nhà thờ Đức Bà Paris' do ai viết?",o:["Émile Zola","Stendhal","Victor Hugo","Alexandre Dumas"],a:2},
+  {q:"Tác phẩm nào KHÔNG phải của Shakespeare?",o:["Hamlet","Othello","Don Quixote","Macbeth"],a:2},
+  {q:"'Harry Potter' do ai viết?",o:["Roald Dahl","J.R.R. Tolkien","J.K. Rowling","C.S. Lewis"],a:2},
+  {q:"Sherlock Holmes sống ở địa chỉ nào?",o:["221B Baker Street","10 Downing Street","221A Abbey Road","1 Scotland Yard"],a:0},
+  {q:"'1984' do ai viết?",o:["Aldous Huxley","Ray Bradbury","George Orwell","Franz Kafka"],a:2},
+  {q:"'Chiến tranh và Hòa bình' do ai viết?",o:["Dostoevsky","Chekhov","Leo Tolstoy","Turgenev"],a:2},
+  {q:"Sử thi vĩ đại của Hy Lạp cổ đại?",o:["Aeneid","Iliad & Odyssey","Metamorphoses","The Republic"],a:1},
+  {q:"Don Quixote của ai?",o:["Lope de Vega","Francisco de Quevedo","Miguel de Cervantes","García Lorca"],a:2},
+  {q:"'Tắt đèn' của ai?",o:["Nam Cao","Ngô Tất Tố","Vũ Trọng Phụng","Nguyên Hồng"],a:1},
+  {q:"'The Lord of the Rings' do ai viết?",o:["J.K. Rowling","C.S. Lewis","J.R.R. Tolkien","Terry Pratchett"],a:2},
+  {q:"Hamlet là hoàng tử của vương quốc nào?",o:["Anh","Đan Mạch","Na Uy","Pháp"],a:1},
+  {q:"'Những người khốn khổ' do ai viết?",o:["Alexandre Dumas","Émile Zola","Gustave Flaubert","Victor Hugo"],a:3},
+  {q:"'Trăm năm cô đơn' do ai viết?",o:["Pablo Neruda","Mario Vargas Llosa","Gabriel García Márquez","Borges"],a:2},
+  {q:"'Nam quốc sơn hà' được cho là của ai?",o:["Lý Thường Kiệt","Trần Quốc Tuấn","Nguyễn Trãi","Lê Lợi"],a:0},
+  {q:"'Crime and Punishment' do ai viết?",o:["Tolstoy","Turgenev","Gorky","Dostoevsky"],a:3},
+  {q:"'Chí Phèo' của ai?",o:["Nguyễn Du","Nam Cao","Tô Hoài","Nguyễn Công Hoan"],a:1},
+  {q:"Trường ma thuật trong Harry Potter tên gì?",o:["Beauxbatons","Durmstrang","Hogwarts","Ilvermorny"],a:2},
+  {q:"'Dế Mèn phiêu lưu ký' do ai viết?",o:["Tô Hoài","Nam Cao","Nguyên Hồng","Vũ Trọng Phụng"],a:0},
+  {q:"Ai viết 'The Great Gatsby'?",o:["Ernest Hemingway","F. Scott Fitzgerald","John Steinbeck","Faulkner"],a:1},
+  {q:"'Bình Ngô Đại Cáo' do ai viết?",o:["Lý Thường Kiệt","Nguyễn Trãi","Trần Quốc Tuấn","Hồ Chí Minh"],a:1},
+  {q:"Nhân vật 'Bá Kiến' trong truyện nào?",o:["Lão Hạc","Chí Phèo","Tắt đèn","Số đỏ"],a:1},
+  {q:"'Pride and Prejudice' do ai viết?",o:["Emily Brontë","Charlotte Brontë","Jane Austen","George Eliot"],a:2},
+  {q:"'Số đỏ' của ai?",o:["Ngô Tất Tố","Nam Cao","Vũ Trọng Phụng","Nguyễn Công Hoan"],a:2},
+  {q:"Nhân vật 'Ahab' trong tác phẩm nào?",o:["Robinson Crusoe","Moby-Dick","Treasure Island","20.000 Leagues"],a:1},
+  {q:"Ai viết 'Lão Hạc'?",o:["Tô Hoài","Nguyên Hồng","Nam Cao","Ngô Tất Tố"],a:2},
+  {q:"'Animal Farm' do ai viết?",o:["Aldous Huxley","George Orwell","H.G. Wells","Ray Bradbury"],a:1},
+  {q:"Nobel Văn học 2024 được trao cho ai?",o:["Haruki Murakami","Annie Ernaux","Han Kang","Jon Fosse"],a:2},
+  {q:"'Đoạn trường tân thanh' mở đầu tác phẩm nào?",o:["Chinh phụ ngâm","Cung oán ngâm khúc","Truyện Kiều","Lục Vân Tiên"],a:2},
+  {q:"Nhân vật 'Từ Hải' trong Truyện Kiều là ai?",o:["Người yêu đầu tiên của Kiều","Kẻ thù của Kiều","Người anh hùng lấy Kiều làm vợ","Quan phủ xử oan Kiều"],a:2},
+  {q:"'Những người bạn của tôi' (Les Amis) là nhóm nhân vật trong tác phẩm nào?",o:["Những người khốn khổ","Ba chàng lính ngự lâm","Nhà thờ Đức Bà Paris","Bá tước Monte Cristo"],a:1},
+  {q:"Tác phẩm 'Lão Hạc' kết thúc thế nào?",o:["Lão Hạc bán con chó và sống hạnh phúc","Lão Hạc tự tử bằng bả chó","Lão Hạc về quê với con trai","Lão Hạc được làng giúp đỡ"],a:1},
+  {q:"'Kafka on the Shore' là tác phẩm của ai?",o:["Yasunari Kawabata","Kenzaburo Oe","Haruki Murakami","Banana Yoshimoto"],a:2},
+  {q:"Ai là tác giả của truyện ngắn 'Cô bé bán diêm'?",o:["Grimm Brothers","Charles Perrault","Hans Christian Andersen","Lewis Carroll"],a:2},
+  {q:"Nhân vật nào nói câu nổi tiếng 'To be or not to be, that is the question'?",o:["Macbeth","Othello","Hamlet","King Lear"],a:2},
+  {q:"'Tây Du Ký' là tác phẩm của ai?",o:["La Quán Trung","Thi Nại Am","Tào Tuyết Cần","Ngô Thừa Ân"],a:3},
+  {q:"Bộ tiểu thuyết 'Tam Quốc Diễn Nghĩa' kể về thời đại nào của Trung Quốc?",o:["Thời Tần Hán","Thời Tam Quốc (220-280 SCN)","Thời Đường","Thời Tống"],a:1},
+  {q:"'Chinh phụ ngâm' của Đặng Trần Côn được ai dịch ra chữ Nôm nổi tiếng nhất?",o:["Nguyễn Du","Hồ Xuân Hương","Đoàn Thị Điểm","Nguyễn Gia Thiều"],a:2},
+  {q:"Tác phẩm 'Mắt biếc' là của nhà văn Việt Nam nào?",o:["Nguyễn Nhật Ánh","Nguyễn Ngọc Tư","Bảo Ninh","Dương Thu Hương"],a:0}
+],
+lifestyle:[
+  {q:"Vitamin C nhiều nhất trong thực phẩm nào?",o:["Cà rốt","Sữa","Cam chanh ổi","Thịt đỏ"],a:2},
+  {q:"Ngủ bao nhiêu tiếng là lý tưởng cho người lớn?",o:["5-6 tiếng","7-9 tiếng","10-12 tiếng","4-5 tiếng"],a:1},
+  {q:"Uống bao nhiêu lít nước mỗi ngày?",o:["0.5-1 lít","1-1.5 lít","2-2.5 lít","3-4 lít"],a:2},
+  {q:"Chỉ số BMI tính thế nào?",o:["Cân nặng × Chiều cao","Cân nặng ÷ Chiều cao²","Cân nặng + Chiều cao","Cân nặng ÷ Chiều cao"],a:1},
+  {q:"Loại vận động nào tốt nhất cho tim mạch?",o:["Yoga","Tạ nặng","Cardio (chạy bơi đạp xe)","Giãn cơ"],a:2},
+  {q:"Dầu ăn nào tốt nhất cho sức khỏe?",o:["Dầu cọ","Dầu lợn","Dầu ô liu nguyên chất","Bơ thực vật"],a:2},
+  {q:"Intermittent fasting phổ biến nhất là?",o:["5:2","16:8","3:1","24:0"],a:1},
+  {q:"Nguồn canxi tốt nhất?",o:["Cà rốt","Sữa và sản phẩm từ sữa","Thịt gà","Gạo trắng"],a:1},
+  {q:"Vitamin D được tổng hợp khi nào?",o:["Ăn nhiều rau","Da tiếp xúc ánh nắng","Uống nhiều nước","Tập thể dục"],a:1},
+  {q:"Bao nhiêu bước đi bộ mỗi ngày được khuyến nghị?",o:["3.000","5.000","10.000","20.000"],a:2},
+  {q:"Omega-3 nhiều trong thực phẩm nào?",o:["Gạo trắng","Cá béo (cá hồi cá thu)","Rau xà lách","Sữa chua"],a:1},
+  {q:"Thói quen nào tệ nhất cho da?",o:["Uống đủ nước","Hút thuốc và không dùng kem chống nắng","Ăn nhiều rau","Ngủ đủ giấc"],a:1},
+  {q:"Blue light ảnh hưởng đến giấc ngủ thế nào?",o:["Giúp ngủ ngon","Không có tác dụng","Ức chế melatonin khó ngủ","Tốt cho mắt"],a:2},
+  {q:"Thực phẩm nào nhiều chất xơ nhất?",o:["Bánh mì trắng","Thịt bò","Rau củ và ngũ cốc nguyên hạt","Sữa chua"],a:2},
+  {q:"WHO khuyến nghị tập thể dục bao lâu mỗi ngày?",o:["10 phút","30 phút","60 phút","2 giờ"],a:1},
+  {q:"Probiotic có trong thực phẩm nào?",o:["Bánh mì","Sữa chua kim chi dưa cải","Thịt đỏ","Trứng luộc"],a:1},
+  {q:"Tư thế ngồi làm việc tốt nhất?",o:["Cúi về phía trước","Lưng thẳng màn hình ngang tầm mắt","Nằm dài","Ngả lưng hoàn toàn"],a:1},
+  {q:"Loại đường nào ít tác hại nhất?",o:["Đường trắng tinh luyện","Đường nâu","Đường từ trái cây tự nhiên","Si-rô agave"],a:2},
+  {q:"Stress mãn tính gây ra vấn đề sức khỏe nào?",o:["Chỉ mệt mỏi","Tim mạch huyết áp suy giảm miễn dịch","Không hại thể chất","Chỉ ảnh hưởng giấc ngủ"],a:1},
+  {q:"Chất gây nghiện trong cà phê?",o:["Taurine","Caffeine","Theobromine","L-theanine"],a:1},
+  {q:"Thực phẩm nào giàu protein nhất?",o:["Cơm trắng","Bánh mì","Thịt cá trứng đậu","Rau xanh"],a:2},
+  {q:"Nên đánh răng mấy lần mỗi ngày?",o:["1 lần","2 lần sáng và tối","3 lần sau mỗi bữa","4 lần"],a:1},
+  {q:"Lý do chính nên ăn sáng đầy đủ?",o:["Vì truyền thống","Cung cấp năng lượng cải thiện tập trung","Chỉ là thói quen","Tránh uống cà phê"],a:1},
+  {q:"Thực phẩm nào nên hạn chế để bảo vệ tim mạch?",o:["Rau xanh","Cá biển","Đồ chiên mỡ động vật muối nhiều","Trái cây tươi"],a:2},
+  {q:"Mindfulness giúp ích gì?",o:["Tăng cơ bắp","Cải thiện tập trung và giảm căng thẳng","Giảm cân nhanh","Tăng thị lực"],a:1},
+  {q:"Ánh sáng nào tốt nhất để đọc sách?",o:["Ánh sáng xanh","Ánh sáng đỏ","Ánh sáng tự nhiên hoặc đèn ấm","Ánh sáng màn hình"],a:2},
+  {q:"Sắt (iron) trong cơ thể làm gì?",o:["Xây dựng xương","Vận chuyển oxy trong máu","Điều hòa đường huyết","Cải thiện thị lực"],a:1},
+  {q:"Ergonomics trong thiết kế bàn làm việc nghĩa là?",o:["Thiết kế đẹp","Tối ưu hóa sự thoải mái và hiệu quả","Tiết kiệm không gian","Giá rẻ"],a:1},
+  {q:"Thói quen nào giúp cải thiện sức khỏe tinh thần?",o:["Xem TV nhiều giờ","Thiền định tập thể dục ngủ đủ giấc","Uống cà phê nhiều","Làm việc không nghỉ"],a:1},
+  {q:"'Detox' phổ biến bao gồm điều gì?",o:["Ăn thêm đồ ngọt","Uống nhiều rượu","Uống nhiều nước ăn rau hạn chế đường","Nhịn ăn hoàn toàn"],a:2},
+  {q:"Thực phẩm nào được coi là 'superfood' giàu chất chống oxy hóa nhất?",o:["Cà chua","Blueberry (việt quất)","Cà rốt","Bắp cải"],a:1},
+  {q:"Tư thế yoga nào giúp giảm stress hiệu quả nhất theo nhiều nghiên cứu?",o:["Warrior Pose","Child's Pose (tư thế đứa trẻ)","Headstand","Plank"],a:1},
+  {q:"Loại trà nào chứa nhiều chất chống oxy hóa nhất?",o:["Trà đen","Trà ô long","Trà xanh Matcha","Trà hoa cúc"],a:2},
+  {q:"Thời điểm nào trong ngày tốt nhất để tập thể dục đốt mỡ?",o:["Ngay sau khi ăn","Buổi sáng sớm lúc bụng đói","Buổi chiều tối","Trước khi ngủ"],a:1},
+  {q:"'Cortisol' là hormone liên quan đến điều gì?",o:["Hạnh phúc và tình yêu","Stress và phản ứng căng thẳng","Giấc ngủ và nghỉ ngơi","Năng lượng và sức mạnh"],a:1},
+  {q:"Trung bình người trưởng thành cần bao nhiêu phút đi bộ mỗi ngày theo khuyến nghị?",o:["10 phút","20 phút","30 phút","60 phút"],a:2},
+  {q:"Loại đồ uống nào giúp cải thiện trí nhớ và tập trung tốt nhất?",o:["Nước tăng lực","Cà phê (lượng vừa phải)","Rượu vang đỏ","Nước ngọt có ga"],a:1},
+  {q:"'Melatonin' là hormone có vai trò gì?",o:["Điều hòa đường huyết","Điều hòa chu kỳ giấc ngủ","Tăng cường miễn dịch","Kiểm soát cơn đói"],a:1},
+  {q:"Thói quen nào được chứng minh giúp tăng tuổi thọ hiệu quả nhất?",o:["Uống nhiều vitamin","Không hút thuốc, tập thể dục đều và ăn uống lành mạnh","Ngủ trên 10 tiếng","Tránh hoàn toàn ánh nắng mặt trời"],a:1},
+  {q:"Thực phẩm nào chứa nhiều kali nhất, tốt cho tim mạch và huyết áp?",o:["Chuối","Táo","Cam","Nho"],a:0}
+],
+world:[
+  {q:"Quốc gia nào có GDP lớn nhất thế giới?",o:["Trung Quốc","Nhật Bản","Đức","Mỹ"],a:3},
+  {q:"Ngôn ngữ nào nhiều người nói nhất (tính cả người học)?",o:["Tây Ban Nha","Tiếng Anh","Quan Thoại","Hindi"],a:1},
+  {q:"Đồng tiền chung của EU?",o:["Pound","Franc","Krone","Euro"],a:3},
+  {q:"Nước nào KHÔNG phải thành viên G7?",o:["Canada","Úc","Nhật Bản","Đức"],a:1},
+  {q:"COVID-19 bùng phát đầu tiên ở thành phố nào?",o:["Bắc Kinh","Thượng Hải","Vũ Hán","Quảng Châu"],a:2},
+  {q:"Bitcoin được tạo ra năm nào?",o:["2005","2007","2009","2011"],a:2},
+  {q:"Mạng xã hội nhiều người dùng nhất (2024)?",o:["Instagram","TikTok","Facebook","YouTube"],a:2},
+  {q:"ASEAN có bao nhiêu quốc gia thành viên?",o:["8","10","12","15"],a:1},
+  {q:"Elon Musk gắn với những công ty nào?",o:["Tesla SpaceX X (Twitter)","Google Tesla SpaceX","Amazon SpaceX Tesla","Apple SpaceX Tesla"],a:0},
+  {q:"WTO là tổ chức nào?",o:["World Tourism Organization","World Trade Organization","World Technology Office","World Treaty Organization"],a:1},
+  {q:"Quốc gia sản xuất dầu mỏ nhiều nhất (2023)?",o:["Saudi Arabia","Iraq","Nga","Mỹ"],a:3},
+  {q:"Net zero toàn cầu mục tiêu vào năm nào?",o:["2030","2040","2050","2060"],a:2},
+  {q:"Ai nhận Nobel Hòa bình 2009?",o:["Hillary Clinton","Joe Biden","Barack Obama","Al Gore"],a:2},
+  {q:"IMF là tổ chức nào?",o:["International Music Federation","International Monetary Fund","International Media Forum","Integrated Market Foundation"],a:1},
+  {q:"Quốc gia nào đầu tiên hợp pháp hóa hôn nhân đồng giới?",o:["Canada","Hà Lan","Thụy Điển","Đan Mạch"],a:1},
+  {q:"Đập Tam Hiệp ở quốc gia nào?",o:["Ấn Độ","Brazil","Nga","Trung Quốc"],a:3},
+  {q:"SpaceX là công ty đầu tiên làm được điều gì?",o:["Lên mặt trăng","Thu hồi và tái sử dụng tên lửa","Đưa người lên sao Hỏa","Phá rào cản âm thanh"],a:1},
+  {q:"World Cup 2030 tổ chức tại đâu?",o:["Úc & New Zealand","Mỹ Canada Mexico","Tây Ban Nha BĐN Morocco","Argentina & Uruguay"],a:2},
+  {q:"Davos tổ chức ở quốc gia nào?",o:["Đức","Áo","Thụy Sĩ","Pháp"],a:2},
+  {q:"WHO có trụ sở chính ở đâu?",o:["New York","Brussels","Paris","Geneva"],a:3},
+  {q:"Quốc gia nào phóng vệ tinh đầu tiên (1957)?",o:["Mỹ","Trung Quốc","Pháp","Liên Xô"],a:3},
+  {q:"COP trong hội nghị khí hậu là viết tắt của gì?",o:["Council of People","Conference of the Parties","Climate Output Program","Coalition of Policy"],a:1},
+  {q:"Quốc gia nào nhiều di sản UNESCO nhất?",o:["Trung Quốc","Ý","Tây Ban Nha","Pháp"],a:1},
+  {q:"'Metaverse' được ai phổ biến rộng rãi?",o:["Elon Musk","Mark Zuckerberg","Jeff Bezos","Tim Cook"],a:1},
+  {q:"Hội nghị G20 quy tụ bao nhiêu nền kinh tế?",o:["15","18","20","25"],a:2},
+  {q:"Năm 2022, quốc gia nào xâm lược Ukraine?",o:["Belarus","Ba Lan","Nga","Hungary"],a:2},
+  {q:"'Silk Road mới' là sáng kiến của quốc gia nào?",o:["Nhật Bản","Mỹ","Trung Quốc","Ấn Độ"],a:2},
+  {q:"Angela Merkel trở thành nữ Thủ tướng Đức năm nào?",o:["2001","2003","2005","2007"],a:2},
+  {q:"COVAX cấp vaccine qua tổ chức nào?",o:["WHO","UNICEF","GAVI/COVAX","World Bank"],a:0},
+  {q:"Quốc gia nào có tỷ lệ người cao tuổi cao nhất?",o:["Đức","Ý","Nhật Bản","Hàn Quốc"],a:2},
+  {q:"Tổ chức nào được trao giải Nobel Hòa bình nhiều lần nhất?",o:["Liên Hợp Quốc","Ủy ban Chữ thập đỏ Quốc tế (ICRC)","Tổ chức Y tế Thế giới","Quỹ Nhi đồng LHQ"],a:1},
+  {q:"Quốc gia nào đầu tiên công nhận độc lập của Mỹ năm 1778?",o:["Anh","Tây Ban Nha","Hà Lan","Pháp"],a:3},
+  {q:"'Hiệp định Paris 2015' liên quan đến vấn đề gì?",o:["Thương mại quốc tế","Biến đổi khí hậu và giảm phát thải","Kiểm soát vũ khí hạt nhân","Tị nạn và di cư"],a:1},
+  {q:"Đồng tiền của Nhật Bản là gì?",o:["Won","Yuan","Yen","Baht"],a:2},
+  {q:"Tổ chức nào được gọi là 'Ngân hàng của các ngân hàng trung ương'?",o:["IMF","World Bank","BIS (Ngân hàng Thanh toán Quốc tế)","WTO"],a:2},
+  {q:"Quốc gia nào có nền kinh tế lớn thứ 3 thế giới?",o:["Đức","Ấn Độ","Nhật Bản","Anh"],a:2},
+  {q:"'BRICS' là nhóm kinh tế gồm những quốc gia nào (ban đầu)?",o:["Brazil, Russia, India, China, South Africa","Britain, Russia, Iran, Canada, Spain","Brazil, Romania, Indonesia, Chile, Sweden","Bolivia, Russia, India, Cambodia, Singapore"],a:0},
+  {q:"Liên Hợp Quốc được thành lập năm nào?",o:["1919","1939","1945","1950"],a:2},
+  {q:"Quốc gia nào có tỷ lệ sử dụng năng lượng tái tạo cao nhất thế giới?",o:["Đức","Mỹ","Iceland","Trung Quốc"],a:2},
+  {q:"'Hiệp ước không phổ biến vũ khí hạt nhân' (NPT) có hiệu lực từ năm nào?",o:["1955","1963","1970","1975"],a:2}
+],
+space:[
+  {q:"Hành tinh nào gần Mặt Trời nhất?",o:["Venus","Mars","Mercury","Earth"],a:2},
+  {q:"Mặt Trời thuộc loại sao nào?",o:["Sao khổng lồ đỏ","Sao lùn trắng","Sao lùn vàng","Sao neutron"],a:2},
+  {q:"Ánh sáng mất bao lâu đi từ Mặt Trời đến Trái Đất?",o:["Khoảng 8 phút","Khoảng 8 giây","Khoảng 8 giờ","Khoảng 1 phút"],a:0},
+  {q:"Thiên hà chứa Hệ Mặt Trời của chúng ta tên là gì?",o:["Andromeda","Milky Way (Ngân Hà)","Triangulum","Whirlpool"],a:1},
+  {q:"Vệ tinh tự nhiên duy nhất của Trái Đất là gì?",o:["Titan","Europa","Mặt Trăng","Phobos"],a:2},
+  {q:"Hành tinh nào có nhiều vệ tinh tự nhiên nhất trong Hệ Mặt Trời?",o:["Jupiter","Saturn","Uranus","Neptune"],a:1},
+  {q:"'Lỗ đen' (Black Hole) là gì?",o:["Vùng không gian trống rỗng","Vùng hấp dẫn cực mạnh không gì thoát được kể cả ánh sáng","Loại sao đã tắt","Hành tinh tối màu"],a:1},
+  {q:"Phi hành gia đầu tiên bay vào vũ trụ là ai?",o:["Neil Armstrong","Buzz Aldrin","Alan Shepard","Yuri Gagarin"],a:3},
+  {q:"Trạm vũ trụ quốc tế (ISS) quay quanh Trái Đất ở độ cao khoảng bao nhiêu?",o:["200 km","400 km","800 km","2000 km"],a:1},
+  {q:"Sao chổi được cấu tạo chủ yếu từ gì?",o:["Đá và kim loại","Băng và bụi vũ trụ","Khí hydro","Plasma"],a:1},
+  {q:"Khoảng cách từ Trái Đất đến Mặt Trăng là bao nhiêu?",o:["Khoảng 38.000 km","Khoảng 384.000 km","Khoảng 3.840.000 km","Khoảng 38.400 km"],a:1},
+  {q:"'Supernova' là gì?",o:["Một hành tinh mới","Vụ nổ khổng lồ khi sao chết","Tên một tàu vũ trụ","Loại thiên thạch"],a:1},
+  {q:"Hành tinh nào được gọi là 'Hành tinh Đỏ'?",o:["Jupiter","Venus","Mars","Saturn"],a:2},
+  {q:"Đơn vị đo khoảng cách trong thiên văn học là gì?",o:["Kilometre","Năm ánh sáng","Parsec","Cả B và C"],a:3},
+  {q:"Tàu vũ trụ nào đầu tiên hạ cánh lên Mặt Trăng có người?",o:["Apollo 10","Apollo 11","Apollo 12","Sputnik 1"],a:1},
+  {q:"Sao Mộc (Jupiter) chủ yếu cấu tạo từ gì?",o:["Đá và kim loại","Băng","Hydro và Helium","Oxy và Nitơ"],a:2},
+  {q:"'Vết Đỏ Lớn' trên Jupiter là gì?",o:["Núi lửa khổng lồ","Hố thiên thạch","Cơn bão kéo dài hàng trăm năm","Đại dương dung nham"],a:2},
+  {q:"Hành tinh nào quay quanh trục gần như nằm ngang (nghiêng ~98°)?",o:["Neptune","Saturn","Uranus","Venus"],a:2},
+  {q:"Kính thiên văn vũ trụ nổi tiếng nhất được đặt theo tên ai?",o:["Einstein","Hubble","Newton","Galileo"],a:1},
+  {q:"Thiên thể nào được phân loại lại thành 'hành tinh lùn' năm 2006?",o:["Ceres","Eris","Pluto","Makemake"],a:2},
+  {q:"Vũ trụ được hình thành cách đây khoảng bao lâu?",o:["4.6 tỷ năm","13.8 tỷ năm","100 tỷ năm","1 tỷ năm"],a:1},
+  {q:"'Thuyết Vụ Nổ Lớn' (Big Bang) mô tả điều gì?",o:["Vụ nổ hạt nhân lớn nhất","Nguồn gốc và sự mở rộng của vũ trụ","Sự va chạm giữa các thiên hà","Sự hình thành Mặt Trăng"],a:1},
+  {q:"Hành tinh nào có một ngày (tự quay) dài hơn một năm (quanh Mặt Trời) của nó?",o:["Mercury","Venus","Mars","Jupiter"],a:1},
+  {q:"Tàu thăm dò nào đã rời khỏi Hệ Mặt Trời và đang ở xa nhất?",o:["Pioneer 10","New Horizons","Voyager 1","Cassini"],a:2},
+  {q:"'Dải Kuiper' trong Hệ Mặt Trời là gì?",o:["Vành đai tiểu hành tinh gần Mặt Trời","Vùng chứa sao chổi và thiên thể lạnh ngoài quỹ đạo Neptune","Vùng bụi quanh Jupiter","Quỹ đạo của các vệ tinh nhân tạo"],a:1},
+  {q:"Hiện tượng 'Nhật thực' xảy ra khi nào?",o:["Mặt Trăng che Mặt Trời","Trái Đất che Mặt Trăng","Mặt Trời che Trái Đất","Sao chổi đi qua Mặt Trời"],a:0},
+  {q:"Nhiệt độ bề mặt của Mặt Trời khoảng bao nhiêu?",o:["600°C","6.000°C","60.000°C","600.000°C"],a:1},
+  {q:"Tàu vũ trụ nào đầu tiên chụp ảnh toàn bộ Trái Đất từ xa?",o:["Apollo 8","Voyager 1","Pioneer 10","Hubble"],a:0},
+  {q:"'Đám mây Oort' là gì?",o:["Đám mây khí quanh Trái Đất","Vùng chứa sao chổi ở rìa xa Hệ Mặt Trời","Tinh vân gần nhất","Vùng tối giữa các sao"],a:1},
+  {q:"Sao nào gần Hệ Mặt Trời nhất (ngoài Mặt Trời)?",o:["Sirius","Alpha Centauri / Proxima Centauri","Betelgeuse","Vega"],a:1},
+  {q:"NASA được thành lập năm nào?",o:["1945","1952","1958","1969"],a:2},
+  {q:"Phi hành gia nào đã đi bộ trên Mặt Trăng lần đầu tiên?",o:["Buzz Aldrin","Neil Armstrong","Alan Bean","Pete Conrad"],a:1},
+  {q:"Hành tinh nào có mật độ thấp đến mức có thể nổi trên nước?",o:["Jupiter","Uranus","Saturn","Neptune"],a:2},
+  {q:"'Vùng có thể sinh sống được' (Habitable Zone) của một ngôi sao là gì?",o:["Vùng gần sao nhất","Khoảng cách mà nước lỏng có thể tồn tại","Vùng có từ trường","Vùng không có thiên thạch"],a:1},
+  {q:"Kính thiên văn không gian James Webb được phóng năm nào?",o:["2018","2019","2021","2023"],a:2},
+  {q:"'Sao Neutron' được tạo thành từ đâu?",o:["Vụ nổ núi lửa vũ trụ","Lõi sao sụp đổ sau supernova","Sự va chạm giữa hai hành tinh","Lỗ đen nhỏ"],a:1},
+  {q:"Hành tinh nào có gió mạnh nhất trong Hệ Mặt Trời?",o:["Jupiter","Saturn","Uranus","Neptune"],a:3},
+  {q:"'Đĩa accretion' (accretion disk) thường xuất hiện quanh thiên thể nào?",o:["Hành tinh thông thường","Lỗ đen hoặc sao neutron","Sao chổi","Tiểu hành tinh"],a:1},
+  {q:"Titan là vệ tinh lớn nhất của hành tinh nào, và nổi tiếng vì điều gì?",o:["Jupiter, có đại dương nước","Saturn, có khí quyển dày và hồ methane lỏng","Uranus, có băng khô","Neptune, có núi lửa"],a:1},
+  {q:"'Hiệu ứng hấp dẫn' của Mặt Trăng gây ra điều gì trên Trái Đất?",o:["Động đất","Thuỷ triều","Gió","Sóng thần"],a:1}
+],
+music:[
+  {q:"Michael Jackson được mệnh danh là gì?",o:["Vua nhạc Rock","Vua nhạc Pop","Vua nhạc Soul","Hoàng tử nhạc Blues"],a:1},
+  {q:"Guitar thông thường có bao nhiêu dây?",o:["4","5","6","7"],a:2},
+  {q:"Nhạc sĩ nào sáng tác bản 'Moonlight Sonata'?",o:["Mozart","Bach","Chopin","Beethoven"],a:3},
+  {q:"'BTS' là nhóm nhạc đến từ quốc gia nào?",o:["Nhật Bản","Trung Quốc","Hàn Quốc","Thái Lan"],a:2},
+  {q:"Album bán chạy nhất lịch sử là album nào?",o:["Thriller - Michael Jackson","Back in Black - AC/DC","The Dark Side of the Moon - Pink Floyd","Eagles - Their Greatest Hits"],a:0},
+  {q:"Nốt nhạc nào có giá trị dài nhất trong ký hiệu nhạc thông thường?",o:["Đen (Quarter)","Trắng (Half)","Tròn (Whole)","Móc đơn (Eighth)"],a:2},
+  {q:"'The Beatles' có bao nhiêu thành viên?",o:["3","4","5","6"],a:1},
+  {q:"Nhạc cụ nào là biểu tượng của nhạc Jazz?",o:["Violin","Trumpet (Kèn trumpet)","Piano","Flute"],a:1},
+  {q:"'Bohemian Rhapsody' là bài hát nổi tiếng của ban nhạc nào?",o:["Led Zeppelin","The Rolling Stones","Queen","Pink Floyd"],a:2},
+  {q:"Dòng nhạc 'Hip-hop' bắt nguồn từ thành phố nào của Mỹ?",o:["Los Angeles","Chicago","Houston","New York"],a:3},
+  {q:"Adele nổi tiếng với giọng hát thuộc giọng nào?",o:["Soprano","Mezzo-soprano","Alto","Contralto"],a:1},
+  {q:"Nhạc cụ piano có bao nhiêu phím?",o:["72","76","88","96"],a:2},
+  {q:"Taylor Swift bắt đầu sự nghiệp âm nhạc với thể loại nào?",o:["Pop","R&B","Country","Rock"],a:2},
+  {q:"'Grammy Awards' trao giải cho lĩnh vực nào?",o:["Điện ảnh","Âm nhạc","Truyền hình","Nghệ thuật sân khấu"],a:1},
+  {q:"Nhạc sĩ nào được gọi là 'Ông hoàng nhạc Jazz'?",o:["Louis Armstrong","Miles Davis","Duke Ellington","John Coltrane"],a:2},
+  {q:"Bài hát 'Despacito' của Luis Fonsi đến từ quốc gia nào?",o:["Mexico","Colombia","Cuba","Puerto Rico"],a:3},
+  {q:"'Violin' thuộc họ nhạc cụ nào?",o:["Bộ gõ","Bộ hơi","Bộ dây kéo cung","Bộ phím"],a:2},
+  {q:"Ai sáng tác bản nhạc 'Für Elise'?",o:["Mozart","Schubert","Beethoven","Brahms"],a:2},
+  {q:"Nhóm nhạc nào nổi tiếng với bài 'Hotel California'?",o:["The Eagles","Fleetwood Mac","The Doors","Creedence Clearwater"],a:0},
+  {q:"'K-pop' là viết tắt của gì?",o:["Korean Popular Music","Korean Pop Music","Korea Pop","Korean Power Music"],a:1},
+  {q:"Nhạc cụ nào có dây được gẩy bằng tay?",o:["Violin","Cello","Harp (Đàn hạc)","Double Bass"],a:2},
+  {q:"'Spotify' là dịch vụ gì?",o:["Mạng xã hội","Nền tảng xem phim","Dịch vụ nghe nhạc trực tuyến","Cửa hàng nhạc cụ"],a:2},
+  {q:"Bài 'Happy Birthday' được sáng tác năm nào?",o:["1893","1920","1935","1950"],a:0},
+  {q:"Nhạc sĩ Việt Nam nào được coi là 'ông hoàng nhạc nhẹ'?",o:["Trịnh Công Sơn","Ngô Thụy Miên","Đức Huy","Phú Quang"],a:1},
+  {q:"Dòng nhạc 'EDM' là viết tắt của gì?",o:["Every Day Music","Electronic Dance Music","Extended Digital Music","Easy Dance Mix"],a:1},
+  {q:"Nhạc sĩ thiên tài người Áo, mất năm 35 tuổi là ai?",o:["Beethoven","Schubert","Mozart","Brahms"],a:2},
+  {q:"'Ukulele' là nhạc cụ bắt nguồn từ đâu?",o:["Nhật Bản","Hawaii","Philippines","Polynesia"],a:1},
+  {q:"Trong ký hiệu nhạc, 'forte' (f) có nghĩa là gì?",o:["Nhẹ nhàng","To, mạnh","Nhanh","Chậm"],a:1},
+  {q:"Ban nhạc 'ABBA' đến từ quốc gia nào?",o:["Na Uy","Đan Mạch","Phần Lan","Thụy Điển"],a:3},
+  {q:"Nhạc cụ nào là biểu tượng của âm nhạc truyền thống Việt Nam?",o:["Đàn guitar","Đàn bầu","Đàn piano","Đàn violin"],a:1},
+  {q:"'Reggae' là thể loại âm nhạc xuất xứ từ đâu?",o:["Nigeria","Ghana","Jamaica","Trinidad"],a:2},
+  {q:"Cặp đôi nhạc sĩ nào sáng tác opera 'The Marriage of Figaro'?",o:["Beethoven & Schiller","Mozart & Da Ponte","Verdi & Boito","Puccini & Illica"],a:1},
+  {q:"Nhạc sĩ người Việt nào nổi tiếng với dòng nhạc 'Tình ca quê hương'?",o:["Văn Cao","Phạm Duy","Trịnh Công Sơn","Hoàng Việt"],a:1},
+  {q:"'Bass guitar' thường có bao nhiêu dây?",o:["4","5","6","3"],a:0},
+  {q:"Nhạc sĩ Frédéric Chopin quốc tịch gì?",o:["Pháp","Đức","Áo","Ba Lan"],a:3},
+  {q:"'Bài Thánh ca buồn' là tác phẩm của nhạc sĩ Việt Nam nào?",o:["Trịnh Công Sơn","Ngô Thụy Miên","Vũ Thành An","Lam Phương"],a:2},
+  {q:"Nhạc sĩ nào được gọi là 'Ông vua nhạc Rock and Roll'?",o:["Chuck Berry","Little Richard","Elvis Presley","Jerry Lee Lewis"],a:2},
+  {q:"'Stradivarius' nổi tiếng là loại nhạc cụ gì?",o:["Piano","Guitar","Violin","Cello"],a:2},
+  {q:"Nhóm nhạc 'Blackpink' có bao nhiêu thành viên?",o:["3","4","5","6"],a:1},
+  {q:"Trong âm nhạc, 'tempo' chỉ điều gì?",o:["Âm lượng của bản nhạc","Tốc độ/nhịp độ của bản nhạc","Cao độ của nốt nhạc","Sắc thái cảm xúc"],a:1}
+]
+};
+
+const AVATARS=['🧔','👩','👦','👧','🧑‍🚀','🧙','🦊','🐼','🤖','👾','🦸','🧸','🐯','🦄','🐸'];
+const LABELS=['A','B','C','D'];
+const COLS=['#ff7b2c','#2ec4b6','#818cf8','#f7c59f'];
+const MEDALS=['🥇','🥈','🥉','4️⃣'];
+let chosenAvatars=[...AVATARS.slice(0,4)];
+
+let gameMode='normal',selCats=[],pCount=2,players=[],scores=[],corrects=[],
+    curP=0,qs=[],curQ=0,tmr=null,tLeft=15,done=false,dots=[];
+// per-player question sets and answer history
+let playerQs=[];       // playerQs[i] = array of 10 questions for player i
+let playerHistory=[];  // playerHistory[i] = [{q, chosen, correct, timeLeft}]
+let sp={qs:[],curQ:[0,0],scores:[0,0],corrects:[0,0],answered:[false,false],finished:[false,false],tLeft:[15,15],tmr:[null,null],dots:[[],[]]};
+
+function $(id){return document.getElementById(id)}
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');s.style.display='none'});const s=$(id);s.style.display='flex';s.classList.add('on');window.scrollTo(0,0)}
+function flash(t){const f=$('fl');f.className='flash f'+t;f.style.opacity='1';setTimeout(()=>f.style.opacity='0',170)}
+function flashSide(s,t){const f=$(s==='left'?'flL':'flR');f.className='flash-'+s+' f'+t;f.style.opacity='1';setTimeout(()=>f.style.opacity='0',170)}
+function beep(ok){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);if(ok){o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.setValueAtTime(1120,c.currentTime+.1);g.gain.setValueAtTime(.2,c.currentTime);g.gain.linearRampToValueAtTime(0,c.currentTime+.28)}else{o.type='sawtooth';o.frequency.setValueAtTime(200,c.currentTime);o.frequency.setValueAtTime(110,c.currentTime+.2);g.gain.setValueAtTime(.14,c.currentTime);g.gain.linearRampToValueAtTime(0,c.currentTime+.4)}o.start();o.stop(c.currentTime+.5)}catch(e){}}
+function confetti(){const cols=['#ff7b2c','#f7c59f','#2ec4b6','#818cf8','#ffd700','#ff69b4','#22c55e'];const cc=$('cc');cc.innerHTML='';for(let i=0;i<70;i++){const d=document.createElement('div');d.className='cdot';d.style.cssText=`left:${Math.random()*100}%;top:-10px;background:${cols[i%cols.length]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.6}s`;cc.appendChild(d)}setTimeout(()=>cc.innerHTML='',6000)}
+
+function buildHome(){
+  $('catGrid').innerHTML=Object.entries(CATS_META).map(([k,v])=>`<div class="cat-btn" data-k="${k}" onclick="toggleCat(this)"><span class="cat-check">✓</span><span class="cat-emoji">${v.emoji}</span><div class="cat-name">${v.name}</div></div>`).join('');
+  renderNames();
+}
+function setMode(m,el){
+  gameMode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  $('catCard').style.display=(m==='ai')?'none':'block';
+  $('aiCard').style.display=(m==='ai')?'block':'none';
+  $('pcountCard').style.display='block'; // tất cả mode đều chọn số người
+  renderNames();
+}
+function toggleCat(el){el.classList.toggle('on');selCats=Array.from(document.querySelectorAll('.cat-btn.on')).map(e=>e.dataset.k)}
+function setPC(el,n){document.querySelectorAll('.pcount-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');pCount=n;renderNames()}
+function renderNames(){
+  const defs=['Bố','Mẹ','Con trai','Con gái'];
+  const count=pCount;
+  // ensure chosenAvatars has enough slots
+  while(chosenAvatars.length<count) chosenAvatars.push(AVATARS[chosenAvatars.length%AVATARS.length]);
+  $('playerNameInputs').innerHTML=Array.from({length:count},(_,i)=>`
+    <div>
+      <div class="prow">
+        <div class="pav" style="background:${COLS[i]}22;cursor:pointer" onclick="toggleAvPicker(${i})" title="Đổi avatar">
+          <span class="av-trigger" id="avDisp${i}">${chosenAvatars[i]}</span>
+        </div>
+        <input class="pinput" id="pn${i}" placeholder="${defs[i]}" value="${defs[i]}">
+      </div>
+      <div class="av-pick-wrap" id="avPicker${i}">
+        <div class="av-grid">${AVATARS.map((av,j)=>`<div class="av-opt${chosenAvatars[i]===av?' picked':''}" onclick="pickAvatar(${i},'${av}')">${av}</div>`).join('')}</div>
+      </div>
+    </div>`).join('')
+}
+function toggleAvPicker(i){
+  const w=$('avPicker'+i);w.classList.toggle('open');
+  for(let j=0;j<pCount;j++){if(j!==i)$('avPicker'+j).classList.remove('open')}
+}
+function pickAvatar(i,av){
+  chosenAvatars[i]=av;$('avDisp'+i).textContent=av;
+  $('avPicker'+i).querySelectorAll('.av-opt').forEach((el,j)=>{el.classList.toggle('picked',AVATARS[j]===av)});
+  $('avPicker'+i).classList.remove('open');
+}
+
+async function handleStart(){
+  const count=pCount;
+  players=Array.from({length:count},(_,i)=>({name:$('pn'+i).value||`Người ${i+1}`,emoji:chosenAvatars[i],color:COLS[i]}));
+  scores=Array(count).fill(0);corrects=Array(count).fill(0);curP=0;
+  playerQs=[];playerHistory=Array.from({length:count},()=>[]);
+  if(gameMode==='ai'){await startAIMode();}
+  else if(gameMode==='split'){
+    selCats=Array.from(document.querySelectorAll('.cat-btn.on')).map(e=>e.dataset.k);
+    if(!selCats.length){alert('Hãy chọn ít nhất 1 chủ đề!');return}
+    startSplitMode();
+  }
+  else{
+    selCats=Array.from(document.querySelectorAll('.cat-btn.on')).map(e=>e.dataset.k);
+    if(!selCats.length){alert('Hãy chọn ít nhất 1 chủ đề!');return}
+    showTurn();
+  }
+}
+
+async function startAIMode(){
+  const topic=$('aiTopic').value.trim();
+  if(!topic){alert('Vui lòng nhập chủ đề cho AI!');return}
+  const btn=$('startBtn');btn.disabled=true;
+  $('aiStatus').innerHTML='<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> AI đang tạo câu hỏi...';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
+        messages:[{role:'user',content:`Tạo 10 câu hỏi trắc nghiệm tiếng Việt về chủ đề: "${topic}". Mỗi câu có 4 lựa chọn và 1 đáp án đúng. Phù hợp cho gia đình 12-14 tuổi. Trả về JSON thuần (không markdown không backtick): [{"q":"câu hỏi","o":["A","B","C","D"],"a":0}] — a là index đáp án đúng (0-3).`}]})
+    });
+    const data=await res.json();
+    let text=data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(text);
+    if(!Array.isArray(parsed)||parsed.length===0)throw new Error();
+    qs=shuffle(parsed).slice(0,10);
+    selCats=['ai_custom'];
+    CATS_META['ai_custom']={name:topic,emoji:'🤖'};
+    $('aiStatus').textContent='✅ Đã tạo xong! Bắt đầu ngay...';
+    setTimeout(()=>{btn.disabled=false;if(gameMode==='split'){race.qs=shuffle(qs);startSplitMode();}else{showTurn();}},700);
+  }catch(e){
+    $('aiStatus').textContent='❌ Lỗi. Kiểm tra kết nối internet và thử lại!';btn.disabled=false;
+  }
+}
+
+function buildAllPlayerQs(count){
+  // Build large pool, shuffle, then slice 10 per player with no overlap
+  let pool=[];selCats.forEach(k=>{if(ALL_Q[k])pool.push(...ALL_Q[k])});
+  pool=shuffle(pool);
+  playerQs=[];
+  for(let i=0;i<count;i++){
+    playerQs.push(pool.slice(i*10,(i+1)*10));
+  }
+  // If pool too small, fallback: give each player 10 from re-shuffle (best effort)
+  for(let i=0;i<count;i++){
+    if(playerQs[i].length<10){
+      playerQs[i]=[...shuffle(pool)].slice(0,10);
+    }
+  }
+}
+function buildQPool(){let pool=[];selCats.forEach(k=>{if(ALL_Q[k])pool.push(...ALL_Q[k])});return shuffle(pool).slice(0,10)}
+
+function showTurn(){
+  if(gameMode==='ai'&&qs.length>0){
+    // AI mode: each player gets same shuffled set (pool limited)
+    qs=shuffle(qs).slice(0,10);
+  } else {
+    // Pre-build all players' unique question sets on first turn (curP===0)
+    if(curP===0) buildAllPlayerQs(players.length);
+    qs=playerQs[curP]||buildQPool();
+  }
+  const p=players[curP];
+  $('taAv').textContent=p.emoji;$('taName').textContent=p.name;$('taName').style.color=p.color;
+  $('taCats').innerHTML=selCats.map(k=>`<div class="chip">${CATS_META[k]?.emoji||'🤖'} ${CATS_META[k]?.name||k}</div>`).join('');
+  showScreen('turnScreen');
+}
+function startPlayerTurn(){
+  const p=players[curP];
+  $('gpEm').textContent=p.emoji;$('gpNm').textContent=p.name;$('gpill').style.background=p.color+'22';
+  renderStrip();curQ=0;dots=[];playerHistory[curP]=[];showScreen('gameScreen');loadQ();
+}
+function renderStrip(){
+  $('scoreStrip').innerHTML=players.map((p,i)=>`<div class="sc-pill ${i===curP?'active-p':''}"><span>${p.emoji}</span><span style="font-size:.76rem;font-weight:800;color:${p.color}">${p.name}</span>${i===curP?'':'<span class="sc-hidden">🔒</span>'}</div>`).join('')
+}
+function loadQ(){
+  if(curQ>=qs.length){endPlayer();return}
+  done=false;const q=qs[curQ];
+  $('qbadge').textContent=`${curQ+1}/10`;$('qtext').textContent=q.q;
+  $('qcard').style.animation='none';void $('qcard').offsetWidth;$('qcard').style.animation='fadeUp .25s ease';
+  $('opts').innerHTML=q.o.map((o,i)=>`<button class="opt" onclick="pick(${i})" style="animation:fadeUp .24s ${i*.055}s both"><div class="olabel">${LABELS[i]}</div>${o}</button>`).join('');
+  $('pdots').innerHTML=Array.from({length:10},(_,i)=>`<div class="pdot ${i<dots.length?(dots[i]?'ok':'no'):(i===curQ?'cur':'')}" id="pd${i}"></div>`).join('');
+  startTimer();
+}
+function startTimer(){clearInterval(tmr);tLeft=15;updT();tmr=setInterval(()=>{tLeft--;updT();if(tLeft<=0){clearInterval(tmr);timeOut()}},1000)}
+function updT(){$('timerBar').style.width=(tLeft/15*100)+'%';const c=tLeft<=4?'var(--no)':tLeft<=7?'var(--warn)':'var(--c2)';$('timerBar').style.background=c;$('timerNum').textContent=tLeft;$('timerNum').style.color=c;}
+function timeOut(){
+  if(done)return;done=true;
+  const btns=document.querySelectorAll('.opt');btns.forEach(b=>b.disabled=true);
+  // Record: skipped (no answer, timeLeft=0)
+  playerHistory[curP].push({q:qs[curQ],chosen:-1,correct:false,timeLeft:0});
+  dots.push(false);flash('no');beep(false);
+  setTimeout(()=>{curQ++;loadQ()},1400);
+}
+function pick(idx){
+  if(done)return;done=true;clearInterval(tmr);
+  const q=qs[curQ],btns=document.querySelectorAll('.opt');
+  btns.forEach(b=>b.disabled=true);
+  const ok=idx===q.a;
+  // Only show neutral "selected" highlight — NO correct/wrong reveal
+  btns[idx].style.background='rgba(255,255,255,.08)';
+  btns[idx].style.borderColor=players[curP].color;
+  btns[idx].querySelector('.olabel').textContent='•';
+  // Record history for post-game review
+  playerHistory[curP].push({q,chosen:idx,correct:ok,timeLeft:tLeft});
+  if(ok){scores[curP]+=50+tLeft*3;corrects[curP]++}
+  dots.push(ok);flash(ok?'ok':'no');beep(ok);
+  setTimeout(()=>{curQ++;loadQ()},1200);
+}
+function endPlayer(){curP++;if(curP<players.length){showTurn()}else{showReveal()}}
+
+function showReveal(){
+  // build player cards with scores hidden
+  $('revealPlayers').innerHTML=players.map((p,i)=>`
+    <div class="reveal-p" style="animation:fadeUp .3s ${i*.1}s both">
+      <div class="reveal-pav">${p.emoji}</div>
+      <div class="reveal-pnm" style="color:${p.color}">${p.name}</div>
+      <div class="reveal-pscore">✅ Xong rồi!</div>
+    </div>`).join('');
+  showScreen('revealScreen');
+}
+function revealResult(){showResult();}
+
+/* ═══════════════════════════════
+   RACE MODE (chế độ đối kháng)
+   - N người, mỗi người lần lượt trả lời 1 câu
+   - Tổng số câu = N * 10, chia đều
+   - Race track: avatar chạy từ trái qua phải
+═══════════════════════════════ */
+let race={
+  qs:[],          // toàn bộ câu hỏi (N*10)
+  curQ:0,         // câu hiện tại (global index)
+  curP:0,         // người đang trả lời
+  scores:[],      // điểm từng người
+  corrects:[],    // số câu đúng từng người
+  tLeft:15,
+  tmr:null,
+  answered:false,
+  maxScore:0      // điểm tối đa có thể đạt (để tính %)
+};
+
+function startSplitMode(){
+  const n=players.length; // 2 players (split locked to 2)
+  const total=n*10;
+  let pool=[];selCats.forEach(k=>{if(ALL_Q[k])pool.push(...ALL_Q[k])});
+  pool=shuffle(pool);
+  // interleave: câu 0→p0, câu 1→p1, câu 2→p0, ...
+  // Nhưng thực ra ta xếp tuần tự: p0 trả lời câu 0,2,4... p1 trả lời câu 1,3,5...
+  // Đơn giản hơn: lấy total câu, lần lượt từng người theo round-robin
+  race={
+    qs: pool.slice(0,total),
+    curQ:0, curP:0,
+    scores:Array(n).fill(0),
+    corrects:Array(n).fill(0),
+    tLeft:15, tmr:null, answered:false,
+    maxScore: total/n*(50+15*3) // nếu đúng hết & nhanh nhất
+  };
+  scores=race.scores;
+  corrects=race.corrects;
+
+  buildRaceTrack();
+  showScreen('raceScreen');
+  loadRaceQ();
+}
+
+function buildRaceTrack(){
+  $('raceTrack').innerHTML=players.map((p,i)=>`
+    <div class="race-lane">
+      <div class="race-lane-name" style="color:${p.color}">${p.name.length>5?p.name.slice(0,5)+'…':p.name}</div>
+      <div class="race-lane-bar-bg">
+        <div class="race-lane-bar" id="rbar${i}" style="width:0%;background:${p.color}20;border:2px solid ${p.color}44">
+          <span class="race-avatar-flag" id="rflag${i}">${p.emoji}</span>
+        </div>
+      </div>
+      <div class="race-lane-score" id="rscore${i}" style="color:${p.color}">0đ</div>
+    </div>`).join('');
+}
+
+function updateRaceTrack(){
+  const maxPossible=race.maxScore||1;
+  players.forEach((p,i)=>{
+    const pct=Math.min(98, race.scores[i]/maxPossible*100);
+    $('rbar'+i).style.width=Math.max(pct,0)+'%';
+    $('rscore'+i).textContent=race.scores[i]+'đ';
+  });
+}
+
+function loadRaceQ(){
+  if(race.curQ>=race.qs.length){endRace();return}
+  race.answered=false;
+  const q=race.qs[race.curQ];
+  const p=players[race.curP];
+  const totalQ=race.qs.length;
+
+  // Header
+  $('race-qbadge').textContent=`Câu ${race.curQ+1}/${totalQ}`;
+  $('race-turn-pill').style.borderColor=p.color;
+  $('race-turn-em').textContent=p.emoji;
+  $('race-turn-nm').textContent=p.name+' trả lời';
+  $('race-turn-nm').style.color=p.color;
+
+  // Question
+  $('race-qtext').textContent=q.q;
+  $('race-qcard').style.animation='none';void $('race-qcard').offsetWidth;$('race-qcard').style.animation='fadeUp .22s ease';
+
+  // Options
+  $('race-opts').innerHTML=q.o.map((o,i)=>`
+    <button class="ropt" onclick="pickRace(${i})" style="animation:fadeUp .2s ${i*.05}s both">
+      <div class="rolabel">${LABELS[i]}</div>${o}
+    </button>`).join('');
+
+  startRaceTimer();
+}
+
+function startRaceTimer(){
+  clearInterval(race.tmr);race.tLeft=15;updRaceT();
+  race.tmr=setInterval(()=>{race.tLeft--;updRaceT();if(race.tLeft<=0){clearInterval(race.tmr);raceTimeOut()}},1000);
+}
+function updRaceT(){
+  $('race-timer-bar').style.width=(race.tLeft/15*100)+'%';
+  const c=race.tLeft<=4?'var(--no)':race.tLeft<=7?'var(--warn)':'var(--c2)';
+  $('race-timer-bar').style.background=c;
+  $('race-timer-num').textContent=race.tLeft;
+  $('race-timer-num').style.color=c;
+}
+
+function raceTimeOut(){
+  if(race.answered)return;race.answered=true;
+  const q=race.qs[race.curQ];
+  const btns=document.querySelectorAll('.ropt');
+  btns.forEach((b,i)=>{b.disabled=true;if(i===q.a){b.classList.add('correct');b.querySelector('.rolabel').textContent='✓'}});
+  flash('no');beep(false);
+  setTimeout(raceNext,1500);
+}
+
+function pickRace(idx){
+  if(race.answered)return;race.answered=true;
+  clearInterval(race.tmr);
+  const q=race.qs[race.curQ];
+  const btns=document.querySelectorAll('.ropt');
+  btns.forEach(b=>b.disabled=true);
+  const ok=idx===q.a;
+  btns[idx].classList.add(ok?'correct':'wrong');
+  btns[idx].querySelector('.rolabel').textContent=ok?'✓':'✗';
+  if(!ok){btns[q.a].classList.add('correct');btns[q.a].querySelector('.rolabel').textContent='✓'}
+  if(ok){
+    const gain=50+race.tLeft*3;
+    race.scores[race.curP]+=gain;
+    race.corrects[race.curP]++;
+    // Score pop animation
+    const pill=$('race-turn-pill');
+    const rect=pill.getBoundingClientRect();
+    const pop=document.createElement('div');
+    pop.className='score-pop';
+    pop.textContent='+'+gain+'đ';
+    pop.style.cssText=`left:${rect.left}px;top:${rect.top-10}px`;
+    document.body.appendChild(pop);
+    setTimeout(()=>pop.remove(),900);
+  }
+  flash(ok?'ok':'no');beep(ok);
+  updateRaceTrack();
+  setTimeout(raceNext,1400);
+}
+
+function raceNext(){
+  race.curQ++;
+  // next player in round-robin
+  race.curP=(race.curP+1)%players.length;
+  loadRaceQ();
+}
+
+function endRace(){
+  scores=[...race.scores];
+  corrects=[...race.corrects];
+  showReveal();
+}
+
+function startSplitModeWithQs(qArr){startSplitMode();} // legacy compat
+
+function showResult(){
+  const ranked=[...players.map((p,i)=>({...p,score:scores[i],correct:corrects[i],idx:i}))].sort((a,b)=>b.score-a.score);
+  $('winnerBanner').innerHTML=`<span class="winner-crown">👑</span><span class="winner-title">Chúc mừng!</span><span class="winner-name" style="color:${ranked[0].color}">${ranked[0].emoji} ${ranked[0].name} thắng cuộc!</span>`;
+  const podOrder=ranked.length>=3?[ranked[1],ranked[0],ranked[2]]:ranked.length===2?[ranked[1],ranked[0]]:[ranked[0]];
+  const blocks=['p2','p1','p3'],podMed=['🥈','🥇','🥉'];
+  $('podium').innerHTML=podOrder.map((p,i)=>`<div class="podium-col" style="animation:fadeUp .38s ${i*.1}s both"><div class="pod-av">${p.emoji}</div><div class="pod-name" style="color:${p.color}">${p.name}</div><div class="pod-sc" style="color:${p.color}">${p.score}đ</div><div class="pod-block ${blocks[i]}">${podMed[i]}</div></div>`).join('');
+  $('lbList').innerHTML=ranked.map((p,ri)=>`<div class="lb-row r${ri+1}" style="animation:fadeUp .3s ${ri*.08}s both"><div class="lb-medal">${MEDALS[ri]}</div><div class="lb-av">${p.emoji}</div><div class="lb-info"><div class="lb-nm" style="color:${p.color}">${p.name}</div><div class="lb-dt">${p.correct}/10 câu đúng · ${p.score}đ</div></div><div class="lb-sc">${p.score}<span style="font-size:.62rem;color:var(--muted)">đ</span></div></div>`).join('');
+
+  // Build per-player answer review
+  let reviewHtml='<div style="font-size:.8rem;font-weight:800;color:var(--muted);text-align:center;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em">📋 Chi tiết từng người</div>';
+  players.forEach((p,pi)=>{
+    const hist=playerHistory[pi]||[];
+    reviewHtml+=`<div class="review-player-hd"><span>${p.emoji}</span><span style="color:${p.color}">${p.name}</span><span style="color:var(--muted);font-size:.75rem;margin-left:auto">${p.correct||corrects[pi]}/10 đúng</span></div>`;
+    hist.forEach((h,qi)=>{
+      const cls=h.chosen===-1?'skip':h.correct?'ok':'no';
+      const badge=h.chosen===-1?'<span class="review-q-badge skip">⏱ Hết giờ</span>':h.correct?`<span class="review-q-badge ok">✓ ${15-h.timeLeft}s</span>`:`<span class="review-q-badge no">✗ ${15-h.timeLeft}s</span>`;
+      const ansLine=h.chosen===-1?`Đáp án đúng: ${h.q.o[h.q.a]}`:h.correct?'':`Bạn chọn: ${h.q.o[h.chosen]} · Đúng: ${h.q.o[h.q.a]}`;
+      reviewHtml+=`<div class="review-q-row ${cls}"><div class="review-q-top"><div class="review-q-txt">${qi+1}. ${h.q.q}</div>${badge}</div>${ansLine?`<div class="review-q-ans">${ansLine}</div>`:''}</div>`;
+    });
+  });
+  $('reviewSection').innerHTML=reviewHtml;
+
+  showScreen('resultScreen');setTimeout(confetti,350);
+}
+function playAgain(){
+  scores=Array(players.length).fill(0);corrects=Array(players.length).fill(0);curP=0;
+  playerQs=[];playerHistory=Array.from({length:players.length},()=>[]);
+  if(gameMode==='split'){startSplitMode();}
+  else if(gameMode==='ai'){qs=shuffle(qs);showTurn();}
+  else{showTurn();}
+}
+function goHome(){$('aiStatus').textContent='';$('startBtn').disabled=false;showScreen('homeScreen')}
+
+buildHome();showScreen('homeScreen');
+</script>
+</body>
+</html>

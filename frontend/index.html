@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800;900&display=swap"
+    rel="stylesheet">
+  <title>🎮 Funny Family Quizzz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --card2: #21262d;
+      --card3: #30363d;
+      --text: #f0f6fc;
+      --muted: #8b949e;
+      --c1: #ff7b2c;
+      --c2: #2ec4b6;
+      --c3: #818cf8;
+      --ok: #22c55e;
+      --no: #ef4444;
+      --warn: #f59e0b
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 1rem 3rem
+    }
+
+    .screen.on {
+      display: flex
+    }
+
+    .inner {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem
+    }
+
+    .logo {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2.5rem;
+      font-weight: 900;
+      text-align: center;
+      margin: 1.5rem 0 .2rem;
+      line-height: 1;
+      background: linear-gradient(135deg, #ff7b2c, #f7c59f, #2ec4b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: .88rem;
+      text-align: center;
+      margin-bottom: 1rem
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted)
+    }
+
+    .loading .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--card3);
+      border-top-color: var(--c2);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .mode-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .5rem;
+      width: 100%;
+      max-width: 420px
+    }
+
+    .mode-btn {
+      background: var(--card);
+      border-radius: 14px;
+      padding: .85rem .5rem;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      text-align: center;
+      transition: all .18s
+    }
+
+    .mode-btn:active {
+      transform: scale(.97)
+    }
+
+    .mode-btn.on {
+      border-color: var(--c2)
+    }
+
+    .mode-btn .mico {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: .3rem
+    }
+
+    .mode-btn .mname {
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .mode-btn .mdesc {
+      font-size: .65rem;
+      color: var(--muted);
+      margin-top: .15rem;
+      line-height: 1.3
+    }
+
+    .mode-btn.on .mname {
+      color: var(--c2)
+    }
+
+    .scard {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.1rem 1.1rem .9rem
+    }
+
+    .slabel {
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .7rem
+    }
+
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .5rem
+    }
+
+    .cat-btn {
+      background: var(--card2);
+      border-radius: 12px;
+      padding: .65rem .55rem;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: all .18s;
+      text-align: center;
+      position: relative
+    }
+
+    .cat-btn.on {
+      border-color: var(--c2);
+      background: rgba(46, 196, 182, .1)
+    }
+
+    .cat-btn:active {
+      transform: scale(.96)
+    }
+
+    .cat-emoji {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: .15rem
+    }
+
+    .cat-name {
+      font-size: .76rem;
+      font-weight: 700;
+      line-height: 1.2
+    }
+
+    .cat-check {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: .72rem;
+      color: var(--c2);
+      opacity: 0;
+      transition: opacity .15s
+    }
+
+    .cat-btn.on .cat-check {
+      opacity: 1
+    }
+
+    .cat-count {
+      font-size: .62rem;
+      color: var(--muted);
+      margin-top: .1rem
+    }
+
+    .ai-input-area {
+      width: 100%;
+      background: var(--card2);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: .8rem;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: .92rem;
+      font-weight: 600;
+      outline: none;
+      resize: none;
+      min-height: 75px;
+      transition: border .2s
+    }
+
+    .ai-input-area:focus {
+      border-color: var(--c3)
+    }
+
+    .ai-input-area::placeholder {
+      color: var(--muted);
+      font-weight: 400
+    }
+
+    .ai-status {
+      text-align: center;
+      font-size: .82rem;
+      min-height: 1.4rem;
+      color: var(--muted);
+      margin-top: .4rem
+    }
+
+    .dots {
+      display: inline-flex;
+      gap: 4px
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--c3);
+      animation: bounce .7s infinite
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: .15s
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: .3s
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-5px)
+      }
+    }
+
+    .pcount-row {
+      display: flex;
+      gap: .5rem
+    }
+
+    .pcount-btn {
+      flex: 1;
+      padding: .55rem;
+      background: var(--card2);
+      border-radius: 10px;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-align: center;
+      transition: all .18s
+    }
+
+    .pcount-btn.on {
+      border-color: var(--c1);
+      color: var(--c1);
+      background: rgba(255, 123, 44, .08)
+    }
+
+    .prow {
+      display: flex;
+      align-items: center;
+      gap: .65rem
+    }
+
+    .pav {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0
+    }
+
+    .pinput {
+      flex: 1;
+      background: var(--card2);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: .45rem .75rem;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: .92rem;
+      font-weight: 700;
+      outline: none;
+      transition: border .18s
+    }
+
+    .pinput:focus {
+      border-color: var(--c2)
+    }
+
+    .pinput::placeholder {
+      color: var(--muted);
+      font-weight: 400
+    }
+
+    .av-pick-wrap {
+      display: none;
+      background: var(--card2);
+      border-radius: 12px;
+      padding: .65rem;
+      margin-top: .35rem;
+      animation: fadeUp .2s ease
+    }
+
+    .av-pick-wrap.open {
+      display: block
+    }
+
+    .av-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .35rem
+    }
+
+    .av-opt {
+      font-size: 1.5rem;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: var(--card3);
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s
+    }
+
+    .av-opt:active {
+      transform: scale(.93)
+    }
+
+    .av-opt.picked {
+      border-color: var(--c2);
+      background: rgba(46, 196, 182, .15)
+    }
+
+    .av-trigger {
+      font-size: .95rem;
+      cursor: pointer;
+      transition: transform .15s;
+      user-select: none;
+      display: inline-block
+    }
+
+    .av-trigger:active {
+      transform: scale(.9)
+    }
+
+    .btn {
+      width: 100%;
+      padding: .95rem;
+      border-radius: 14px;
+      border: none;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .18s;
+      letter-spacing: .01em
+    }
+
+    .btn:active {
+      transform: scale(.98)
+    }
+
+    .btn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-orange {
+      background: linear-gradient(135deg, #ff7b2c, #e5631a);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(255, 123, 44, .4)
+    }
+
+    .btn-ghost {
+      background: var(--card);
+      color: var(--muted);
+      border: 2px solid var(--card3)
+    }
+
+    #turnScreen {
+      justify-content: center
+    }
+
+    .turn-box {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .9rem;
+      width: 100%;
+      max-width: 380px
+    }
+
+    .turn-av {
+      font-size: 4rem;
+      line-height: 1;
+      animation: pop .4s ease
+    }
+
+    .turn-name {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2rem;
+      font-weight: 900
+    }
+
+    .turn-sub {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.5
+    }
+
+    .turn-cats {
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+      justify-content: center
+    }
+
+    .chip {
+      background: var(--card2);
+      border-radius: 20px;
+      padding: .25rem .7rem;
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--muted)
+    }
+
+    .secret-note {
+      background: rgba(129, 140, 248, .1);
+      border: 1.5px solid rgba(129, 140, 248, .3);
+      border-radius: 12px;
+      padding: .6rem 1rem;
+      font-size: .8rem;
+      color: #a5b4fc;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      width: 100%;
+      justify-content: center
+    }
+
+    #gameScreen {
+      padding: .75rem 1rem
+    }
+
+    .game-top {
+      width: 100%;
+      max-width: 420px
+    }
+
+    .gtop-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .4rem
+    }
+
+    .qbadge {
+      background: var(--card2);
+      border-radius: 8px;
+      padding: .28rem .65rem;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--muted)
+    }
+
+    .player-pill {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      border-radius: 20px;
+      padding: .28rem .75rem
+    }
+
+    .timer-wrap {
+      position: relative;
+      height: 7px;
+      background: var(--card2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: .7rem
+    }
+
+    .timer-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s linear, background .4s;
+      background: var(--c2)
+    }
+
+    .qcard {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.1rem;
+      width: 100%;
+      max-width: 420px;
+      min-height: 95px;
+      display: flex;
+      align-items: center;
+      margin-bottom: .7rem
+    }
+
+    .qtext {
+      font-size: .98rem;
+      font-weight: 700;
+      line-height: 1.55
+    }
+
+    .opts {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      width: 100%;
+      max-width: 420px
+    }
+
+    .opt {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      background: var(--card);
+      border: 2.5px solid transparent;
+      border-radius: 13px;
+      padding: .75rem .85rem;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: all .14s;
+      text-align: left
+    }
+
+    .opt:active {
+      transform: scale(.99)
+    }
+
+    .opt:disabled {
+      cursor: default
+    }
+
+    .opt.correct {
+      background: rgba(34, 197, 94, .13);
+      border-color: var(--ok)
+    }
+
+    .opt.wrong {
+      background: rgba(239, 68, 68, .1);
+      border-color: var(--no)
+    }
+
+    .olabel {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: var(--card2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .74rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      transition: all .15s
+    }
+
+    .opt.correct .olabel {
+      background: var(--ok);
+      color: #fff
+    }
+
+    .opt.wrong .olabel {
+      background: var(--no);
+      color: #fff
+    }
+
+    .score-strip {
+      display: flex;
+      gap: .45rem;
+      width: 100%;
+      max-width: 420px;
+      margin-top: .7rem;
+      flex-wrap: wrap;
+      justify-content: center
+    }
+
+    .sc-pill {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      border-radius: 10px;
+      padding: .28rem .65rem;
+      font-size: .76rem;
+      font-weight: 700;
+      background: var(--card)
+    }
+
+    .sc-pill.active-p {
+      outline: 2px solid var(--c1)
+    }
+
+    .sc-hidden {
+      font-size: .7rem;
+      color: var(--muted)
+    }
+
+    .pdots {
+      display: flex;
+      gap: 3px;
+      margin-top: .6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 420px
+    }
+
+    .pdot {
+      width: 20px;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--card2);
+      transition: background .3s
+    }
+
+    .pdot.ok {
+      background: var(--ok)
+    }
+
+    .pdot.no {
+      background: var(--no)
+    }
+
+    .pdot.cur {
+      background: var(--c1)
+    }
+
+    #raceScreen {
+      padding: .7rem .9rem 1.5rem;
+      align-items: center
+    }
+
+    .race-header {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .6rem
+    }
+
+    .race-qbadge {
+      background: var(--card);
+      border-radius: 8px;
+      padding: .3rem .75rem;
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--muted)
+    }
+
+    .race-turn-pill {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--card);
+      border-radius: 20px;
+      padding: .3rem .8rem;
+      font-size: .82rem;
+      font-weight: 800;
+      border: 2px solid transparent;
+      transition: border .2s
+    }
+
+    .race-timer-num {
+      font-size: .85rem;
+      font-weight: 900;
+      min-width: 1.8rem;
+      text-align: right
+    }
+
+    .race-track-wrap {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: .45rem;
+      background: var(--card);
+      border-radius: 16px;
+      padding: .8rem .9rem;
+      margin-bottom: .7rem
+    }
+
+    .race-lane {
+      display: flex;
+      align-items: center;
+      gap: .5rem
+    }
+
+    .race-lane-bar-bg {
+      flex: 1;
+      height: 22px;
+      background: var(--card2);
+      border-radius: 99px;
+      overflow: visible;
+      position: relative
+    }
+
+    .race-lane-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .5s cubic-bezier(.34, 1.56, .64, 1);
+      position: relative;
+      min-width: 0
+    }
+
+    .race-avatar-flag {
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .5));
+      transition: right .5s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    .race-lane-name {
+      font-size: .7rem;
+      font-weight: 800;
+      white-space: nowrap;
+      width: 38px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .race-lane-score {
+      font-size: .7rem;
+      font-weight: 900;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .race-timer-wrap {
+      width: 100%;
+      max-width: 480px;
+      height: 7px;
+      background: var(--card2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: .7rem
+    }
+
+    .race-timer-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s linear, background .4s;
+      background: var(--c2)
+    }
+
+    .race-qcard {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.1rem;
+      width: 100%;
+      max-width: 480px;
+      min-height: 85px;
+      display: flex;
+      align-items: center;
+      margin-bottom: .65rem
+    }
+
+    .race-qtext {
+      font-size: .98rem;
+      font-weight: 700;
+      line-height: 1.55
+    }
+
+    .race-opts {
+      display: flex;
+      flex-direction: column;
+      gap: .48rem;
+      width: 100%;
+      max-width: 480px
+    }
+
+    .ropt {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      background: var(--card);
+      border: 2.5px solid transparent;
+      border-radius: 13px;
+      padding: .72rem .85rem;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: all .14s;
+      text-align: left;
+      width: 100%
+    }
+
+    .ropt:active {
+      transform: scale(.99)
+    }
+
+    .ropt:disabled {
+      cursor: default
+    }
+
+    .ropt.correct {
+      background: rgba(34, 197, 94, .13);
+      border-color: var(--ok)
+    }
+
+    .ropt.wrong {
+      background: rgba(239, 68, 68, .1);
+      border-color: var(--no)
+    }
+
+    .rolabel {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: var(--card2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .74rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      transition: all .15s
+    }
+
+    .ropt.correct .rolabel {
+      background: var(--ok);
+      color: #fff
+    }
+
+    .ropt.wrong .rolabel {
+      background: var(--no);
+      color: #fff
+    }
+
+    @keyframes scorePop {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-32px) scale(1.3)
+      }
+    }
+
+    .score-pop {
+      position: fixed;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--ok);
+      pointer-events: none;
+      z-index: 300;
+      animation: scorePop .9s ease forwards
+    }
+
+    #resultScreen {
+      padding: 1rem
+    }
+
+    .winner-banner {
+      text-align: center;
+      margin: .75rem 0 .25rem
+    }
+
+    .winner-crown {
+      font-size: 2.2rem;
+      display: block
+    }
+
+    .winner-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd700, #ff7b2c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block
+    }
+
+    .winner-name {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.3rem;
+      font-weight: 900
+    }
+
+    .podium-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: .5rem;
+      margin: .9rem 0;
+      width: 100%;
+      max-width: 380px
+    }
+
+    .podium-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .25rem
+    }
+
+    .pod-av {
+      font-size: 1.9rem
+    }
+
+    .pod-name {
+      font-size: .72rem;
+      font-weight: 800;
+      text-align: center;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .pod-sc {
+      font-size: .72rem;
+      font-weight: 800
+    }
+
+    .pod-block {
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      width: 78px
+    }
+
+    .pod-block.p1 {
+      height: 85px;
+      background: linear-gradient(180deg, #ffd700, #c8a800)
+    }
+
+    .pod-block.p2 {
+      height: 62px;
+      background: linear-gradient(180deg, #c0c0c0, #909090)
+    }
+
+    .pod-block.p3 {
+      height: 46px;
+      background: linear-gradient(180deg, #cd7f32, #a05a1a)
+    }
+
+    .lb-list {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: .45rem
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      background: var(--card);
+      border-radius: 13px;
+      padding: .75rem .85rem;
+      border: 2px solid transparent
+    }
+
+    .lb-row.r1 {
+      border-color: rgba(255, 215, 0, .4);
+      background: rgba(255, 215, 0, .06)
+    }
+
+    .lb-row.r2 {
+      border-color: rgba(192, 192, 192, .3)
+    }
+
+    .lb-row.r3 {
+      border-color: rgba(205, 127, 50, .3)
+    }
+
+    .lb-medal {
+      font-size: 1.1rem;
+      width: 26px;
+      text-align: center
+    }
+
+    .lb-av {
+      font-size: 1.2rem;
+      width: 32px;
+      text-align: center
+    }
+
+    .lb-info {
+      flex: 1
+    }
+
+    .lb-nm {
+      font-size: .92rem;
+      font-weight: 800
+    }
+
+    .lb-dt {
+      font-size: .71rem;
+      color: var(--muted);
+      margin-top: .1rem
+    }
+
+    .lb-sc {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--c2)
+    }
+
+    .result-note {
+      font-size: .75rem;
+      color: var(--muted);
+      text-align: center;
+      margin: .25rem 0
+    }
+
+    #revealScreen {
+      justify-content: center
+    }
+
+    .reveal-box {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 380px
+    }
+
+    .reveal-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1.1
+    }
+
+    .reveal-players {
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: .25rem 0
+    }
+
+    .reveal-p {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .3rem;
+      background: var(--card);
+      border-radius: 14px;
+      padding: .75rem .9rem;
+      min-width: 72px
+    }
+
+    .reveal-pav {
+      font-size: 2rem
+    }
+
+    .reveal-pnm {
+      font-size: .76rem;
+      font-weight: 800
+    }
+
+    .reveal-pscore {
+      font-size: .72rem;
+      color: var(--muted)
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(34, 197, 94, .4)
+    }
+
+    .review-section {
+      width: 100%;
+      max-width: 400px;
+      margin-top: .5rem
+    }
+
+    .review-player-hd {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin: 1rem 0 .4rem;
+      font-weight: 800;
+      font-size: .9rem
+    }
+
+    .review-q-row {
+      background: var(--card);
+      border-radius: 10px;
+      padding: .6rem .75rem;
+      margin-bottom: .3rem;
+      border-left: 3px solid transparent;
+      font-size: .78rem
+    }
+
+    .review-q-row.ok {
+      border-color: var(--ok)
+    }
+
+    .review-q-row.no {
+      border-color: var(--no)
+    }
+
+    .review-q-row.skip {
+      border-color: var(--card3)
+    }
+
+    .review-q-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .5rem
+    }
+
+    .review-q-txt {
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.35
+    }
+
+    .review-q-badge {
+      font-size: .7rem;
+      font-weight: 800;
+      padding: .15rem .45rem;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .review-q-badge.ok {
+      background: rgba(34, 197, 94, .18);
+      color: var(--ok)
+    }
+
+    .review-q-badge.no {
+      background: rgba(239, 68, 68, .15);
+      color: var(--no)
+    }
+
+    .review-q-badge.skip {
+      background: var(--card2);
+      color: var(--muted)
+    }
+
+    .review-q-ans {
+      margin-top: .25rem;
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.4
+    }
+
+    .flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99;
+      opacity: 0;
+      transition: opacity .12s
+    }
+
+    .fok {
+      background: rgba(34, 197, 94, .13)
+    }
+
+    .fno {
+      background: rgba(239, 68, 68, .12)
+    }
+
+    .flash-left {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 98;
+      opacity: 0;
+      transition: opacity .12s
+    }
+
+    .flash-right {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 98;
+      opacity: 0;
+      transition: opacity .12s
+    }
+
+    .cconf {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
+      overflow: hidden
+    }
+
+    .cdot {
+      position: absolute;
+      border-radius: 2px;
+      animation: cfall linear forwards
+    }
+
+    @keyframes cfall {
+      from {
+        transform: translateY(-20px) rotate(0);
+        opacity: 1
+      }
+
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(.8);
+        opacity: 0
+      }
+
+      60% {
+        transform: scale(1.1)
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flash" id="fl"></div>
+  <div class="flash-left" id="flL"></div>
+  <div class="flash-right" id="flR"></div>
+  <div class="cconf" id="cc"></div>
+
+  <!-- HOME -->
+  <div class="screen on" id="homeScreen">
+    <div class="logo">🎮 Funny Family Quizzz</div>
+    <div class="tagline">🏆 Ai thua thì đi rửa bát. Cùng battle nào! 🏆</div>
+    <div class="inner">
+      <div class="scard">
+        <div class="slabel">🎯 Chế độ chơi</div>
+        <div class="mode-row">
+          <div class="mode-btn on" id="modeNormal" onclick="setMode('normal',this)">
+            <span class="mico">🎮</span>
+            <div class="mname">Solo</div>
+            <div class="mdesc">Lần lượt từng người</div>
+          </div>
+          <div class="mode-btn" id="modeSplit" onclick="setMode('split',this)">
+            <span class="mico">⚔️</span>
+            <div class="mname">Đối kháng</div>
+            <div class="mdesc">2 người cùng lúc</div>
+          </div>
+        </div>
+      </div>
+      <div class="scard" id="catCard">
+        <div class="slabel">📚 Chủ đề (chọn nhiều)</div>
+        <div class="loading" id="catLoading">
+          <div class="spinner"></div>
+          <div>Đang tải...</div>
+        </div>
+        <div class="cat-grid" id="catGrid" style="display:none"></div>
+      </div>
+      <div class="scard">
+        <div class="slabel">👥 Số người chơi</div>
+        <div class="pcount-row">
+          <div class="pcount-btn on" onclick="setPC(this,2)">2</div>
+          <div class="pcount-btn" onclick="setPC(this,3)">3</div>
+          <div class="pcount-btn" onclick="setPC(this,4)">4</div>
+        </div>
+      </div>
+      <div class="scard">
+        <div class="slabel">✏️ Tên & Avatar người chơi</div>
+        <div id="playerNameInputs" style="display:flex;flex-direction:column;gap:.6rem"></div>
+      </div>
+      <button class="btn btn-orange" id="startBtn" onclick="handleStart()">🚀 Bắt đầu!</button>
+    </div>
+  </div>
+
+  <!-- TURN INTRO -->
+  <div class="screen" id="turnScreen">
+    <div class="turn-box inner">
+      <div class="turn-av" id="taAv">🧔</div>
+      <div class="turn-name" id="taName">Bố</div>
+      <div class="turn-sub">Đến lượt bạn! Người khác có thể xem câu hỏi nhưng <b>điểm bí mật đến cuối</b> 🤫</div>
+      <div class="turn-cats" id="taCats"></div>
+      <div class="secret-note">🔒 Điểm số ẩn — reveal khi tất cả chơi xong</div>
+      <button class="btn btn-orange" onclick="startPlayerTurn()">🎯 Tôi sẵn sàng!</button>
+    </div>
+  </div>
+
+  <!-- NORMAL GAME -->
+  <div class="screen" id="gameScreen">
+    <div class="game-top">
+      <div class="gtop-row">
+        <div class="qbadge" id="qbadge">1/10</div>
+        <div class="player-pill" id="gpill"><span id="gpEm">🧔</span><span id="gpNm"
+            style="font-size:.82rem;font-weight:800">Bố</span></div>
+        <div class="qbadge" id="timerNum" style="color:var(--c2);min-width:2rem;text-align:center">10</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-bar" id="timerBar"></div>
+      </div>
+    </div>
+    <div class="qcard" id="qcard">
+      <div class="qtext" id="qtext"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="score-strip" id="scoreStrip"></div>
+    <div class="pdots" id="pdots"></div>
+  </div>
+
+  <!-- RACE SCREEN -->
+  <div class="screen" id="raceScreen">
+    <div class="race-header" style="width:100%;max-width:480px">
+      <div class="race-qbadge" id="race-qbadge">Câu 1</div>
+      <div class="race-turn-pill" id="race-turn-pill">
+        <span id="race-turn-em">🧔</span>
+        <span id="race-turn-nm" style="font-size:.8rem">Bố trả lời</span>
+      </div>
+      <div class="race-timer-num" id="race-timer-num" style="color:var(--c2)">10</div>
+    </div>
+    <div class="race-track-wrap" id="raceTrack"></div>
+    <div class="race-timer-wrap">
+      <div class="race-timer-bar" id="race-timer-bar"></div>
+    </div>
+    <div class="race-qcard" id="race-qcard">
+      <div class="race-qtext" id="race-qtext"></div>
+    </div>
+    <div class="race-opts" id="race-opts"></div>
+  </div>
+
+  <!-- REVEAL SCREEN -->
+  <div class="screen" id="revealScreen">
+    <div class="reveal-box">
+      <div style="font-size:3.5rem">🎉</div>
+      <div class="reveal-title">Tất cả đã<br>hoàn thành!</div>
+      <div style="color:var(--muted);font-size:.9rem;line-height:1.5">Điểm số vẫn đang được giữ bí mật...<br>Bạn đã sẵn
+        sàng chưa?</div>
+      <div class="reveal-players" id="revealPlayers"></div>
+      <button class="btn btn-green" style="margin-top:.5rem" onclick="revealResult()">🏆 Xem kết quả!</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="resultScreen">
+    <div class="inner" style="align-items:center">
+      <div class="winner-banner" id="winnerBanner"></div>
+      <div class="podium-wrap" id="podium"></div>
+      <div class="result-note">🎊 Bảng xếp hạng cuối cùng</div>
+      <div class="lb-list" id="lbList"></div>
+      <div class="review-section" id="reviewSection"></div>
+      <div style="display:flex;flex-direction:column;gap:.55rem;width:100%;margin-top:.9rem">
+        <button class="btn btn-orange" onclick="playAgain()">🔄 Chơi lại</button>
+        <button class="btn btn-ghost" onclick="goHome()">🏠 Trang chủ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== CONFIG ====================
+    const API_BASE = 'http://localhost:3000/api';
+    const TIMER_MAX = 10;
+    const SCORE_BASE = 50;
+    const SCORE_PER_SEC = 3; // max per question: 50 + 10*3 = 80pts
+
+    // ==================== STATE ====================
+    const AVATARS = ['🧔', '👩', '👦', '👧', '🧑‍🚀', '🧙', '🦊', '🐼', '🤖', '👾', '🦸', '🧸', '🐯', '🦄', '🐸'];
+    const LABELS = ['A', 'B', 'C', 'D'];
+    const COLS = ['#ff7b2c', '#2ec4b6', '#818cf8', '#f7c59f'];
+    const MEDALS = ['🥇', '🥈', '🥉', '4️⃣'];
+    let chosenAvatars = [...AVATARS.slice(0, 4)];
+    let audioCtx = null;
+
+    let CATS_META = {};  // Loaded from API
+    let gameMode = 'normal', selCats = [], pCount = 2, players = [], scores = [], corrects = [],
+      curP = 0, qs = [], curQ = 0, tmr = null, tLeft = 10, done = false, dots = [];
+    let playerQs = [];
+    let playerHistory = [];
+    let sp = { qs: [], curQ: 0, curP: 0, scores: [0, 0], corrects: [0, 0], tLeft: 10, tmr: null, answered: false, maxScore: 0 };
+
+    function $(id) { return document.getElementById(id) }
+    function shuffle(a) { let b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[b[i], b[j]] = [b[j], b[i]] } return b }
+    function showScreen(id) { document.querySelectorAll('.screen').forEach(s => { s.classList.remove('on'); s.style.display = 'none' }); const s = $(id); s.style.display = 'flex'; s.classList.add('on'); window.scrollTo(0, 0) }
+    function flash(t) { const f = $('fl'); f.className = 'flash f' + t; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 170) }
+    function flashSide(s, t) { const f = $(s === 'left' ? 'flL' : 'flR'); f.className = 'flash-' + s + ' f' + t; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 170) }
+    function beep(ok) { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const c = audioCtx, o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); if (ok) { o.type = 'sine'; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.setValueAtTime(1120, c.currentTime + .1); g.gain.setValueAtTime(.2, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .28) } else { o.type = 'sawtooth'; o.frequency.setValueAtTime(200, c.currentTime); o.frequency.setValueAtTime(110, c.currentTime + .2); g.gain.setValueAtTime(.14, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .4) } o.start(); o.stop(c.currentTime + .5) } catch (e) { } }
+    function confetti() { const cols = ['#ff7b2c', '#f7c59f', '#2ec4b6', '#818cf8', '#ffd700', '#ff69b4', '#22c55e']; const cc = $('cc'); cc.innerHTML = ''; for (let i = 0; i < 70; i++) { const d = document.createElement('div'); d.className = 'cdot'; d.style.cssText = `left:${Math.random() * 100}%;top:-10px;background:${cols[i % cols.length]};width:${6 + Math.random() * 8}px;height:${6 + Math.random() * 8}px;border-radius:${Math.random() > .5 ? '50%' : '3px'};animation-duration:${2 + Math.random() * 2.5}s;animation-delay:${Math.random() * .6}s`; cc.appendChild(d) } setTimeout(() => cc.innerHTML = '', 6000) }
+
+    // ==================== API CALLS ====================
+    async function fetchCategories() {
+      const res = await fetch(`${API_BASE}/categories`);
+      const data = await res.json();
+      return data.data;
+    }
+
+    async function fetchRandomQuestions(category, count = 10) {
+      const res = await fetch(`${API_BASE}/questions/${category}/random?count=${count}`);
+      const data = await res.json();
+      return data.data;
+    }
+
+    async function fetchBatchQuestions(categories, countPerCat = 10) {
+      const res = await fetch(`${API_BASE}/questions/batch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categories, countPerCategory: countPerCat })
+      });
+      const data = await res.json();
+      return data.data;
+    }
+
+    // ==================== HOME BUILD ====================
+    async function buildHome() {
+      try {
+        const cats = await fetchCategories();
+        CATS_META = {};
+        cats.forEach(c => { CATS_META[c.id] = { name: c.name, emoji: c.emoji }; });
+
+        $('catLoading').style.display = 'none';
+        $('catGrid').style.display = 'grid';
+        $('catGrid').innerHTML = cats.map(c => `
+      <div class="cat-btn" data-k="${c.id}" onclick="toggleCat(this)">
+        <span class="cat-check">✓</span>
+        <span class="cat-emoji">${c.emoji}</span>
+        <div class="cat-name">${c.name}</div>
+      </div>
+    `).join('');
+      } catch (e) {
+        $('catLoading').innerHTML = '<div style="color:var(--no)">Không thể kết nối server!</div><div style="font-size:.8rem;color:var(--muted);margin-top:.5rem">Đảm bảo server đang chạy ở port 3000</div>';
+      }
+      renderNames();
+    }
+
+    function setMode(m, el) {
+      gameMode = m;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+      renderNames();
+    }
+
+    function toggleCat(el) {
+      el.classList.toggle('on');
+      selCats = Array.from(document.querySelectorAll('.cat-btn.on')).map(e => e.dataset.k);
+    }
+
+    function setPC(el, n) {
+      document.querySelectorAll('.pcount-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+      pCount = n;
+      renderNames();
+    }
+
+    function renderNames() {
+      const defs = ['Bố', 'Mẹ', 'Con trai', 'Con gái'];
+      while (chosenAvatars.length < pCount) chosenAvatars.push(AVATARS[chosenAvatars.length % AVATARS.length]);
+      $('playerNameInputs').innerHTML = Array.from({ length: pCount }, (_, i) => `
+    <div>
+      <div class="prow">
+        <div class="pav" style="background:${COLS[i]}22;cursor:pointer" onclick="toggleAvPicker(${i})" title="Đổi avatar">
+          <span class="av-trigger" id="avDisp${i}">${chosenAvatars[i]}</span>
+        </div>
+        <input class="pinput" id="pn${i}" placeholder="${defs[i]}" value="${defs[i]}">
+      </div>
+      <div class="av-pick-wrap" id="avPicker${i}">
+        <div class="av-grid">${AVATARS.map((av, j) => `<div class="av-opt${chosenAvatars[i] === av ? ' picked' : ''}" onclick="pickAvatar(${i},'${av}')">${av}</div>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+    }
+
+    function toggleAvPicker(i) {
+      const w = $('avPicker' + i);
+      w.classList.toggle('open');
+      for (let j = 0; j < pCount; j++) { if (j !== i) $('avPicker' + j).classList.remove('open'); }
+    }
+
+    function pickAvatar(i, av) {
+      chosenAvatars[i] = av;
+      $('avDisp' + i).textContent = av;
+      $('avPicker' + i).querySelectorAll('.av-opt').forEach((el, j) => { el.classList.toggle('picked', AVATARS[j] === av); });
+      $('avPicker' + i).classList.remove('open');
+    }
+
+    // ==================== GAME START ====================
+    async function handleStart() {
+      const count = pCount;
+      players = Array.from({ length: count }, (_, i) => ({
+        name: $('pn' + i).value || `Người ${i + 1}`,
+        emoji: chosenAvatars[i],
+        color: COLS[i]
+      }));
+
+      if (selCats.length === 0) {
+        alert('Hãy chọn ít nhất 1 chủ đề!');
+        return;
+      }
+
+      $('startBtn').disabled = true;
+      $('startBtn').textContent = 'Đang tải câu hỏi...';
+
+      try {
+        scores = Array(count).fill(0);
+        corrects = Array(count).fill(0);
+        curP = 0;
+        playerQs = [];
+        playerHistory = Array.from({ length: count }, () => []);
+
+        if (gameMode === 'split') {
+          await startSplitMode();
+        } else {
+          await startNormalMode();
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+        $('startBtn').disabled = false;
+        $('startBtn').textContent = '🚀 Bắt đầu!';
+      }
+    }
+
+    async function startNormalMode() {
+      // Fetch a large pool of unique questions ONCE, then slice for each player
+      const totalNeeded = players.length * 10;
+      // Fetch extra to ensure we have enough unique questions
+      const data = await fetchBatchQuestions(selCats, totalNeeded);
+      const pool = shuffle(data.questions);
+
+      // Distribute: player 0 gets 0-9, player 1 gets 10-19, etc.
+      for (let i = 0; i < players.length; i++) {
+        playerQs.push(pool.slice(i * 10, (i + 1) * 10));
+      }
+
+      showTurn();
+    }
+
+    async function startSplitMode() {
+      const n = players.length;
+      const total = n * 10;
+
+      // Fetch all questions needed
+      const data = await fetchBatchQuestions(selCats, total);
+
+      // Interleave: P0 gets Q0,Q2,Q4... P1 gets Q1,Q3,Q5...
+      const pool = shuffle(data.questions);
+      sp = {
+        qs: pool,
+        curQ: 0, curP: 0,
+        scores: Array(n).fill(0),
+        corrects: Array(n).fill(0),
+        tLeft: 10, tmr: null, answered: false,
+        maxScore: total / n * (SCORE_BASE + TIMER_MAX * SCORE_PER_SEC)
+      };
+      scores = sp.scores;
+      corrects = sp.corrects;
+
+      buildRaceTrack();
+      showScreen('raceScreen');
+      loadRaceQ();
+    }
+
+    function showTurn() {
+      const p = players[curP];
+      $('taAv').textContent = p.emoji;
+      $('taName').textContent = p.name;
+      $('taName').style.color = p.color;
+      $('taCats').innerHTML = selCats.map(k => `<div class="chip">${CATS_META[k]?.emoji || '📚'} ${CATS_META[k]?.name || k}</div>`).join('');
+      showScreen('turnScreen');
+      $('startBtn').disabled = false;
+      $('startBtn').textContent = '🚀 Bắt đầu!';
+    }
+
+    function startPlayerTurn() {
+      const p = players[curP];
+      $('gpEm').textContent = p.emoji;
+      $('gpNm').textContent = p.name;
+      $('gpill').style.background = p.color + '22';
+      renderStrip();
+      curQ = 0;
+      dots = [];
+      playerHistory[curP] = [];
+      qs = playerQs[curP];
+      showScreen('gameScreen');
+      loadQ();
+    }
+
+    function renderStrip() {
+      $('scoreStrip').innerHTML = players.map((p, i) => `
+    <div class="sc-pill ${i === curP ? 'active-p' : ''}">
+      <span>${p.emoji}</span>
+      <span style="font-size:.76rem;font-weight:800;color:${p.color}">${p.name}</span>
+      ${i === curP ? '' : '<span class="sc-hidden">🔒</span>'}
+    </div>
+  `).join('');
+    }
+
+    function loadQ() {
+      if (curQ >= qs.length) { endPlayer(); return; }
+      done = false;
+      const q = qs[curQ];
+      $('qbadge').textContent = `${curQ + 1}/10`;
+      $('qtext').textContent = q.q;
+      $('qcard').style.animation = 'none';
+      void $('qcard').offsetWidth;
+      $('qcard').style.animation = 'fadeUp .25s ease';
+      $('opts').innerHTML = q.o.map((o, i) => `
+    <button class="opt" onclick="pick(${i})" style="animation:fadeUp .24s ${i * .055}s both">
+      <div class="olabel">${LABELS[i]}</div>${o}
+    </button>
+  `).join('');
+      $('pdots').innerHTML = Array.from({ length: 10 }, (_, i) => `<div class="pdot ${i < dots.length ? (dots[i] ? 'ok' : 'no') : (i === curQ ? 'cur' : '')}" id="pd${i}"></div>`).join('');
+      startTimer();
+    }
+
+    function startTimer() { clearInterval(tmr); tLeft = TIMER_MAX; updT(); tmr = setInterval(() => { tLeft--; updT(); if (tLeft <= 0) { clearInterval(tmr); timeOut() } }, 1000); }
+    function updT() { $('timerBar').style.width = (tLeft / TIMER_MAX * 100) + '%'; const c = tLeft <= 3 ? 'var(--no)' : tLeft <= 5 ? 'var(--warn)' : 'var(--c2)'; $('timerBar').style.background = c; $('timerNum').textContent = tLeft; $('timerNum').style.color = c; }
+
+    function timeOut() {
+      if (done) return;
+      done = true;
+      const q = qs[curQ];
+      const btns = document.querySelectorAll('.opt');
+      btns.forEach(b => b.disabled = true);
+      btns[q.a].classList.add('correct');
+      btns[q.a].querySelector('.olabel').textContent = '✓';
+      playerHistory[curP].push({ q, chosen: -1, correct: false, timeLeft: 0 });
+      dots.push(false);
+      flash('no');
+      beep(false);
+      setTimeout(() => { curQ++; loadQ(); }, 1400);
+    }
+
+    function pick(idx) {
+      if (done) return;
+      done = true;
+      clearInterval(tmr);
+      const q = qs[curQ];
+      const btns = document.querySelectorAll('.opt');
+      btns.forEach(b => b.disabled = true);
+      const ok = idx === q.a;
+      btns[idx].classList.add(ok ? 'correct' : 'wrong');
+      btns[idx].querySelector('.olabel').textContent = ok ? '✓' : '✗';
+      if (!ok) { btns[q.a].classList.add('correct'); btns[q.a].querySelector('.olabel').textContent = '✓'; }
+      playerHistory[curP].push({ q, chosen: idx, correct: ok, timeLeft: tLeft });
+      if (ok) { scores[curP] += SCORE_BASE + tLeft * SCORE_PER_SEC; corrects[curP]++; }
+      dots.push(ok);
+      flash(ok ? 'ok' : 'no');
+      beep(ok);
+      setTimeout(() => { curQ++; loadQ(); }, 1200);
+    }
+
+    function endPlayer() {
+      curP++;
+      if (curP < players.length) { showTurn(); }
+      else { showReveal(); }
+    }
+
+    function showReveal() {
+      $('revealPlayers').innerHTML = players.map((p, i) => `
+    <div class="reveal-p" style="animation:fadeUp .3s ${i * .1}s both">
+      <div class="reveal-pav">${p.emoji}</div>
+      <div class="reveal-pnm" style="color:${p.color}">${p.name}</div>
+      <div class="reveal-pscore">✅ Xong rồi!</div>
+    </div>
+  `).join('');
+      showScreen('revealScreen');
+    }
+
+    function revealResult() { showResult(); }
+
+    // ==================== RACE MODE ====================
+    function buildRaceTrack() {
+      $('raceTrack').innerHTML = players.map((p, i) => `
+    <div class="race-lane">
+      <div class="race-lane-name" style="color:${p.color}">${p.name.length > 5 ? p.name.slice(0, 5) + '…' : p.name}</div>
+      <div class="race-lane-bar-bg">
+        <div class="race-lane-bar" id="rbar${i}" style="width:0%;background:${p.color}20;border:2px solid ${p.color}44">
+          <span class="race-avatar-flag" id="rflag${i}">${p.emoji}</span>
+        </div>
+      </div>
+      <div class="race-lane-score" id="rscore${i}" style="color:${p.color}">0đ</div>
+    </div>
+  `).join('');
+    }
+
+    function updateRaceTrack() {
+      const maxPossible = sp.maxScore || 1;
+      players.forEach((p, i) => {
+        const pct = Math.min(98, sp.scores[i] / maxPossible * 100);
+        $('rbar' + i).style.width = Math.max(pct, 0) + '%';
+        $('rscore' + i).textContent = sp.scores[i] + 'đ';
+      });
+    }
+
+    function loadRaceQ() {
+      if (sp.curQ >= sp.qs.length) { endRace(); return; }
+      sp.answered = false;
+      const q = sp.qs[sp.curQ];
+      const p = players[sp.curP];
+      const totalQ = sp.qs.length;
+
+      $('race-qbadge').textContent = `Câu ${sp.curQ + 1}/${totalQ}`;
+      $('race-turn-pill').style.borderColor = p.color;
+      $('race-turn-em').textContent = p.emoji;
+      $('race-turn-nm').textContent = p.name + ' trả lời';
+      $('race-turn-nm').style.color = p.color;
+
+      $('race-qtext').textContent = q.q;
+      $('race-qcard').style.animation = 'none';
+      void $('race-qcard').offsetWidth;
+      $('race-qcard').style.animation = 'fadeUp .22s ease';
+
+      $('race-opts').innerHTML = q.o.map((o, i) => `
+    <button class="ropt" onclick="pickRace(${i})" style="animation:fadeUp .2s ${i * .05}s both">
+      <div class="rolabel">${LABELS[i]}</div>${o}
+    </button>
+  `).join('');
+
+      startRaceTimer();
+    }
+
+    function startRaceTimer() {
+      clearInterval(sp.tmr);
+      sp.tLeft = TIMER_MAX;
+      updRaceT();
+      sp.tmr = setInterval(() => { sp.tLeft--; updRaceT(); if (sp.tLeft <= 0) { clearInterval(sp.tmr); raceTimeOut() } }, 1000);
+    }
+
+    function updRaceT() {
+      $('race-timer-bar').style.width = (sp.tLeft / TIMER_MAX * 100) + '%';
+      const c = sp.tLeft <= 3 ? 'var(--no)' : sp.tLeft <= 5 ? 'var(--warn)' : 'var(--c2)';
+      $('race-timer-bar').style.background = c;
+      $('race-timer-num').textContent = sp.tLeft;
+      $('race-timer-num').style.color = c;
+    }
+
+    function raceTimeOut() {
+      if (sp.answered) return;
+      sp.answered = true;
+      const q = sp.qs[sp.curQ];
+      const btns = document.querySelectorAll('.ropt');
+      btns.forEach((b, i) => { b.disabled = true; if (i === q.a) { b.classList.add('correct'); b.querySelector('.rolabel').textContent = '✓' } });
+      flash('no');
+      beep(false);
+      setTimeout(raceNext, 1500);
+    }
+
+    function pickRace(idx) {
+      if (sp.answered) return;
+      sp.answered = true;
+      clearInterval(sp.tmr);
+      const q = sp.qs[sp.curQ];
+      const btns = document.querySelectorAll('.ropt');
+      btns.forEach(b => b.disabled = true);
+      const ok = idx === q.a;
+      btns[idx].classList.add(ok ? 'correct' : 'wrong');
+      btns[idx].querySelector('.rolabel').textContent = ok ? '✓' : '✗';
+      if (!ok) { btns[q.a].classList.add('correct'); btns[q.a].querySelector('.rolabel').textContent = '✓'; }
+      if (ok) {
+        const gain = SCORE_BASE + sp.tLeft * SCORE_PER_SEC;
+        sp.scores[sp.curP] += gain;
+        sp.corrects[sp.curP]++;
+        const pill = $('race-turn-pill');
+        const rect = pill.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'score-pop';
+        pop.textContent = '+' + gain + 'đ';
+        pop.style.cssText = `left:${rect.left}px;top:${rect.top - 10}px`;
+        document.body.appendChild(pop);
+        setTimeout(() => pop.remove(), 900);
+      }
+      flash(ok ? 'ok' : 'no');
+      beep(ok);
+      updateRaceTrack();
+      setTimeout(raceNext, 1400);
+    }
+
+    function raceNext() {
+      sp.curQ++;
+      sp.curP = (sp.curP + 1) % players.length;
+      loadRaceQ();
+    }
+
+    function endRace() {
+      scores = [...sp.scores];
+      corrects = [...sp.corrects];
+      showReveal();
+    }
+
+    // ==================== RESULTS ====================
+    function showResult() {
+      const ranked = [...players.map((p, i) => ({ ...p, score: scores[i], correct: corrects[i], idx: i }))].sort((a, b) => b.score - a.score);
+      $('winnerBanner').innerHTML = `<span class="winner-crown">👑</span><span class="winner-title">Chúc mừng!</span><span class="winner-name" style="color:${ranked[0].color}">${ranked[0].emoji} ${ranked[0].name} thắng cuộc!</span>`;
+      const podOrder = ranked.length >= 3 ? [ranked[1], ranked[0], ranked[2]] : ranked.length === 2 ? [ranked[1], ranked[0]] : [ranked[0]];
+      const blocks = ['p2', 'p1', 'p3'], podMed = ['🥈', '🥇', '🥉'];
+      $('podium').innerHTML = podOrder.map((p, i) => `<div class="podium-col" style="animation:fadeUp .38s ${i * .1}s both"><div class="pod-av">${p.emoji}</div><div class="pod-name" style="color:${p.color}">${p.name}</div><div class="pod-sc" style="color:${p.color}">${p.score}đ</div><div class="pod-block ${blocks[i]}">${podMed[i]}</div></div>`).join('');
+      $('lbList').innerHTML = ranked.map((p, ri) => `<div class="lb-row r${ri + 1}" style="animation:fadeUp .3s ${ri * .08}s both"><div class="lb-medal">${MEDALS[ri]}</div><div class="lb-av">${p.emoji}</div><div class="lb-info"><div class="lb-nm" style="color:${p.color}">${p.name}</div><div class="lb-dt">${p.correct}/10 câu đúng · ${p.score}đ</div></div><div class="lb-sc">${p.score}<span style="font-size:.62rem;color:var(--muted)">đ</span></div></div>`).join('');
+
+      let reviewHtml = '<div style="font-size:.8rem;font-weight:800;color:var(--muted);text-align:center;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em">📋 Chi tiết từng người</div>';
+      players.forEach((p, pi) => {
+        const hist = playerHistory[pi] || [];
+        reviewHtml += `<div class="review-player-hd"><span>${p.emoji}</span><span style="color:${p.color}">${p.name}</span><span style="color:var(--muted);font-size:.75rem;margin-left:auto">${corrects[pi]}/10 đúng</span></div>`;
+        hist.forEach((h, qi) => {
+          const cls = h.chosen === -1 ? 'skip' : h.correct ? 'ok' : 'no';
+          const badge = h.chosen === -1 ? '<span class="review-q-badge skip">⏱ Hết giờ</span>' : h.correct ? `<span class="review-q-badge ok">✓ ${TIMER_MAX - h.timeLeft}s</span>` : `<span class="review-q-badge no">✗ ${TIMER_MAX - h.timeLeft}s</span>`;
+          const ansLine = h.chosen === -1 ? `Đáp án đúng: ${h.q.o[h.q.a]}` : h.correct ? '' : `Bạn chọn: ${h.q.o[h.chosen]} · Đúng: ${h.q.o[h.q.a]}`;
+          reviewHtml += `<div class="review-q-row ${cls}"><div class="review-q-top"><div class="review-q-txt">${qi + 1}. ${h.q.q}</div>${badge}</div>${ansLine ? `<div class="review-q-ans">${ansLine}</div>` : ''}</div>`;
+        });
+      });
+      $('reviewSection').innerHTML = reviewHtml;
+
+      showScreen('resultScreen');
+      setTimeout(confetti, 350);
+    }
+
+    async function playAgain() {
+      scores = Array(players.length).fill(0);
+      corrects = Array(players.length).fill(0);
+      curP = 0;
+      playerQs = [];
+      playerHistory = Array.from({ length: players.length }, () => []);
+      try {
+        if (gameMode === 'split') {
+          await startSplitMode();
+        } else {
+          await startNormalMode();
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+      }
+    }
+
+    function goHome() {
+      $('startBtn').disabled = false;
+      $('startBtn').textContent = '🚀 Bắt đầu!';
+      showScreen('homeScreen');
+    }
+
+    // ==================== INIT ====================
+    buildHome();
+    showScreen('homeScreen');
+  </script>
+</body>
+
+</html>

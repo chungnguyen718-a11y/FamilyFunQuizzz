@@ -1,0 +1,16 @@
+{
+  "categories": [
+    {"id": "tech", "name": "Công nghệ", "emoji": "💻"},
+    {"id": "football", "name": "Bóng đá", "emoji": "⚽"},
+    {"id": "anime", "name": "Anime", "emoji": "🎌"},
+    {"id": "science", "name": "Khoa học", "emoji": "🔬"},
+    {"id": "geography", "name": "Địa lý", "emoji": "🗺️"},
+    {"id": "math", "name": "Toán học", "emoji": "🔢"},
+    {"id": "history", "name": "Lịch sử", "emoji": "🏛️"},
+    {"id": "literature", "name": "Văn học", "emoji": "📖"},
+    {"id": "lifestyle", "name": "Đời sống", "emoji": "🌿"},
+    {"id": "world", "name": "Thế giới", "emoji": "🌍"},
+    {"id": "space", "name": "Vũ trụ", "emoji": "🚀"},
+    {"id": "music", "name": "Âm nhạc", "emoji": "🎵"}
+  ]
+}

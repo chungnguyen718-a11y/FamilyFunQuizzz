@@ -1492,7 +1492,7 @@
     const LABELS = ['A', 'B', 'C', 'D'];
     const COLS = ['#ff7b2c', '#2ec4b6', '#818cf8', '#f7c59f'];
     const MEDALS = ['🥇', '🥈', '🥉', '4️⃣'];
-    let chosenAvatars = [...AVATARS.slice(0, 4)];
+    let chosenAvatars = ['🦊', '🎃', ...AVATARS.slice(2, 4)];
     let audioCtx = null;
 
     let CATS_META = {};  // Loaded from API
@@ -1594,7 +1594,7 @@
     }
 
     function renderNames() {
-      const defs = ['Bố', 'Mẹ', 'Con trai', 'Con gái'];
+      const defs = ['Phong', 'Nguyên', 'Con trai', 'Con gái'];
       while (chosenAvatars.length < pCount) chosenAvatars.push(AVATARS[chosenAvatars.length % AVATARS.length]);
       $('playerNameInputs').innerHTML = Array.from({ length: pCount }, (_, i) => `
     <div>

@@ -1371,7 +1371,10 @@
         </div>
       </div>
       <div class="scard" id="catCard">
-        <div class="slabel">📚 Chủ đề (chọn nhiều)</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem">
+          <div class="slabel" style="margin-bottom:0">📚 Chủ đề (chọn nhiều)</div>
+          <button id="selectAllBtn" onclick="toggleAllCats()" style="background:var(--card2);border:1.5px solid var(--card3);border-radius:8px;padding:.25rem .65rem;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s">Chọn tất</button>
+        </div>
         <div class="loading" id="catLoading">
           <div class="spinner"></div>
           <div>Đang tải...</div>
@@ -1484,7 +1487,8 @@
     const SCORE_PER_SEC = 3; // max per question: 50 + 10*3 = 80pts
 
     // ==================== STATE ====================
-    const AVATARS = ['🧔', '👩', '👦', '👧', '🧑‍🚀', '🧙', '🦊', '🐼', '🤖', '👾', '🦸', '🧸', '🐯', '🦄', '🐸'];
+    const AVATARS = ['🧔', '👩', '👦', '👧', '🧑‍🚀', '🧙', '🦊', '🐼', '🤖', '👾', '🦸', '🧸', '🐯', '🦄', '🐸',
+                     '🐉', '🧜', '🐧', '🦁', '🐺', '🐙', '🦖', '👻', '🎃', '🦋'];
     const LABELS = ['A', 'B', 'C', 'D'];
     const COLS = ['#ff7b2c', '#2ec4b6', '#818cf8', '#f7c59f'];
     const MEDALS = ['🥇', '🥈', '🥉', '4️⃣'];
@@ -1561,6 +1565,25 @@
     function toggleCat(el) {
       el.classList.toggle('on');
       selCats = Array.from(document.querySelectorAll('.cat-btn.on')).map(e => e.dataset.k);
+      updateSelectAllBtn();
+    }
+
+    function toggleAllCats() {
+      const btns = document.querySelectorAll('.cat-btn');
+      const allOn = [...btns].every(b => b.classList.contains('on'));
+      btns.forEach(b => allOn ? b.classList.remove('on') : b.classList.add('on'));
+      selCats = allOn ? [] : [...btns].map(b => b.dataset.k);
+      updateSelectAllBtn();
+    }
+
+    function updateSelectAllBtn() {
+      const btn = $('selectAllBtn');
+      if (!btn) return;
+      const btns = document.querySelectorAll('.cat-btn');
+      const allOn = [...btns].every(b => b.classList.contains('on'));
+      btn.textContent = allOn ? 'Bỏ chọn' : 'Chọn tất';
+      btn.style.color = allOn ? 'var(--c2)' : 'var(--muted)';
+      btn.style.borderColor = allOn ? 'var(--c2)' : 'var(--card3)';
     }
 
     function setPC(el, n) {
@@ -1660,7 +1683,7 @@
       const data = await fetchBatchQuestions(selCats, total);
 
       // Interleave: P0 gets Q0,Q2,Q4... P1 gets Q1,Q3,Q5...
-      const pool = shuffle(data.questions);
+      const pool = shuffle(data.questions).slice(0, total);
       sp = {
         qs: pool,
         curQ: 0, curP: 0,

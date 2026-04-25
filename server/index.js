@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(join(__dirname, '..', 'frontend')));
 
 // Path to data folder (go up from /server to project root)
 const DATA_PATH = join(__dirname, '..', 'data');

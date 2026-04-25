@@ -1502,25 +1502,19 @@
       curP = 0, qs = [], curQ = 0, tmr = null, tLeft = 10, done = false, dots = [];
     let playerQs = [];
     let playerHistory = [];
-    let sp = { qs: [], curQ: 0, curP: 0, scores: [0, 0], corrects: [0, 0], tLeft: 10, tmr: null, answered: false, maxScore: 0 };
+    let sp = { qs: [], curQ: 0, curP: 0, scores: Array(pCount).fill(0), corrects: Array(pCount).fill(0), tLeft: TIMER_MAX, tmr: null, answered: false, maxScore: 0 };
 
     function $(id) { return document.getElementById(id) }
     function shuffle(a) { let b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[b[i], b[j]] = [b[j], b[i]] } return b }
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => { s.classList.remove('on'); s.style.display = 'none' }); const s = $(id); s.style.display = 'flex'; s.classList.add('on'); window.scrollTo(0, 0) }
     function flash(t) { const f = $('fl'); f.className = 'flash f' + t; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 170) }
-    function flashSide(s, t) { const f = $(s === 'left' ? 'flL' : 'flR'); f.className = 'flash-' + s + ' f' + t; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 170) }
+
     function beep(ok) { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const c = audioCtx, o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); if (ok) { o.type = 'sine'; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.setValueAtTime(1120, c.currentTime + .1); g.gain.setValueAtTime(.2, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .28) } else { o.type = 'sawtooth'; o.frequency.setValueAtTime(200, c.currentTime); o.frequency.setValueAtTime(110, c.currentTime + .2); g.gain.setValueAtTime(.14, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .4) } o.start(); o.stop(c.currentTime + .5) } catch (e) { } }
     function confetti() { const cols = ['#ff7b2c', '#f7c59f', '#2ec4b6', '#818cf8', '#ffd700', '#ff69b4', '#22c55e']; const cc = $('cc'); cc.innerHTML = ''; for (let i = 0; i < 70; i++) { const d = document.createElement('div'); d.className = 'cdot'; d.style.cssText = `left:${Math.random() * 100}%;top:-10px;background:${cols[i % cols.length]};width:${6 + Math.random() * 8}px;height:${6 + Math.random() * 8}px;border-radius:${Math.random() > .5 ? '50%' : '3px'};animation-duration:${2 + Math.random() * 2.5}s;animation-delay:${Math.random() * .6}s`; cc.appendChild(d) } setTimeout(() => cc.innerHTML = '', 6000) }
 
     // ==================== API CALLS ====================
     async function fetchCategories() {
       const res = await fetch(`${API_BASE}/categories`);
-      const data = await res.json();
-      return data.data;
-    }
-
-    async function fetchRandomQuestions(category, count = 10) {
-      const res = await fetch(`${API_BASE}/questions/${category}/random?count=${count}`);
       const data = await res.json();
       return data.data;
     }

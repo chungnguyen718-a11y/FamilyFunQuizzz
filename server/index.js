@@ -71,7 +71,7 @@ app.get('/api/categories', (req, res) => {
   }
 });
 
-// GET /api/questions/:category - Get all questions for a category
+// GET /api/questions/:category
 app.get('/api/questions/:category', (req, res) => {
   try {
     const { category } = req.params;
@@ -102,8 +102,7 @@ app.get('/api/questions/:category', (req, res) => {
   }
 });
 
-// GET /api/questions/:category/random - Get random questions for a game
-// Query: ?count=10&difficulty=1,2
+// GET /api/questions/:category/random?count=10&difficulty=1,2
 app.get('/api/questions/:category/random', (req, res) => {
   try {
     const { category } = req.params;
@@ -135,9 +134,6 @@ app.get('/api/questions/:category/random', (req, res) => {
     // Take requested count (max available)
     count = Math.min(count, questions.length);
     questions = questions.slice(0, count);
-
-    // Keep the `a` (answer index) in response - client needs it to check correct answers
-    // In a real production app you'd compute score server-side, but for this simple game it's fine
 
     res.json({
       success: true,
@@ -188,8 +184,6 @@ app.post('/api/questions/batch', (req, res) => {
     // Take requested count
     const totalCount = Math.min(countPerCategory * categories.length, allQuestions.length);
     allQuestions = allQuestions.slice(0, totalCount);
-
-    // Keep answer index `a` - client needs it to check correct answers
 
     res.json({
       success: true,

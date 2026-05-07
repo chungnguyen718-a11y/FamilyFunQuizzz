@@ -1343,6 +1343,56 @@
         transform: translateY(0)
       }
     }
+
+    /* ── Difficulty Filter ── */
+    .diff-row {
+      display: flex;
+      gap: .5rem
+    }
+
+    .diff-btn {
+      flex: 1;
+      padding: .48rem .3rem;
+      background: var(--card2);
+      border-radius: 10px;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-align: center;
+      transition: all .18s;
+      line-height: 1.3
+    }
+
+    .diff-btn:active {
+      transform: scale(.96)
+    }
+
+    .diff-btn.on[data-d="0"] {
+      border-color: var(--c2);
+      color: var(--c2);
+      background: rgba(46,196,182,.08)
+    }
+
+    .diff-btn.on[data-d="1"] {
+      border-color: var(--ok);
+      color: var(--ok);
+      background: rgba(34,197,94,.08)
+    }
+
+    .diff-btn.on[data-d="2"] {
+      border-color: var(--warn);
+      color: var(--warn);
+      background: rgba(245,158,11,.08)
+    }
+
+    .diff-btn.on[data-d="3"] {
+      border-color: var(--no);
+      color: var(--no);
+      background: rgba(239,68,68,.08)
+    }
   </style>
 </head>
 
@@ -1382,6 +1432,15 @@
           <div>Đang tải...</div>
         </div>
         <div class="cat-grid" id="catGrid" style="display:none"></div>
+      </div>
+      <div class="scard">
+        <div class="slabel">🎚️ Độ khó</div>
+        <div class="diff-row">
+          <div class="diff-btn on" data-d="0" onclick="setDiff(this)">🌈<br>Tất cả</div>
+          <div class="diff-btn" data-d="1" onclick="setDiff(this)">🟢<br>Dễ</div>
+          <div class="diff-btn" data-d="2" onclick="setDiff(this)">🟡<br>TB</div>
+          <div class="diff-btn" data-d="3" onclick="setDiff(this)">🔴<br>Khó</div>
+        </div>
       </div>
       <div class="scard">
         <div class="slabel">👥 Số người chơi</div>
@@ -1502,6 +1561,7 @@
       curP = 0, qs = [], curQ = 0, tmr = null, tLeft = 10, done = false, dots = [];
     let playerQs = [];
     let playerHistory = [];
+    let selectedDifficulty = 0; // 0 = all, 1 = easy, 2 = medium, 3 = hard
     let sp = { qs: [], curQ: 0, curP: 0, scores: Array(pCount).fill(0), corrects: Array(pCount).fill(0), tLeft: TIMER_MAX, tmr: null, answered: false, maxScore: 0 };
 
     function $(id) { return document.getElementById(id) }
@@ -1520,12 +1580,19 @@
     }
 
     async function fetchBatchQuestions(categories, countPerCat = 10) {
+      const body = { categories, countPerCategory: countPerCat };
+      if (selectedDifficulty !== 0) {
+        body.difficulties = [selectedDifficulty];
+      }
       const res = await fetch(`${API_BASE}/questions/batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categories, countPerCategory: countPerCat })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
+      if (!data.success || !data.data?.questions?.length) {
+        throw new Error('Không tìm thấy câu hỏi phù hợp. Hãy thử chọn độ khó khác hoặc thêm chủ đề.');
+      }
       return data.data;
     }
 
@@ -1580,6 +1647,12 @@
       btn.textContent = allOn ? 'Bỏ chọn' : 'Chọn tất';
       btn.style.color = allOn ? 'var(--c2)' : 'var(--muted)';
       btn.style.borderColor = allOn ? 'var(--c2)' : 'var(--card3)';
+    }
+
+    function setDiff(el) {
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+      selectedDifficulty = parseInt(el.dataset.d, 10);
     }
 
     function setPC(el, n) {
